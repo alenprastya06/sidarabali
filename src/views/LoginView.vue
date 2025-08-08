@@ -19,7 +19,7 @@
             d="M13 10V3L4 14h7v7l9-11h-7z"
           />
         </svg>
-        <h2 class="text-3xl font-extrabold text-gray-900">Login</h2>
+        <h2 class="text-3xl font-extrabold text-gray-900">Loginsss</h2>
       </div>
       <form @submit.prevent="handleLogin">
         <div class="mb-5">
