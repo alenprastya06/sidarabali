@@ -1,0 +1,110 @@
+<template>
+  <div class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen p-8">
+    <div class="max-w-4xl mx-auto">
+      <div class="text-center mb-12">
+        <h1 class="text-4xl font-bold text-gray-800 mb-4">Format Dokumen Resmi</h1>
+        <p class="text-gray-600 text-lg">Silakan unduh format dokumen yang Anda butuhkan</p>
+      </div>
+
+      <div class="grid md:grid-cols-1 gap-6">
+        <!-- Button 1 -->
+        <div
+          class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 border border-gray-100"
+        >
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+              <div class="bg-blue-100 p-3 rounded-full">
+                <i class="fas fa-file-alt text-blue-600 text-xl"></i>
+              </div>
+              <div>
+                <h3 class="text-lg font-semibold text-gray-800">
+                  Format Surat Pernyataan Keabsahan Dokumen
+                </h3>
+                <p class="text-gray-500 text-sm">
+                  Template resmi untuk pernyataan keabsahan dokumen
+                </p>
+              </div>
+            </div>
+            <a
+              href="https://docs.google.com/document/d/16xjazS_wyqlIEi9RPxoYTS7X5i6SOp_3/edit?usp=sharing&ouid=106840474612694305461&rtpof=true&sd=true"
+              target="_blank"
+              class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 hover:scale-105 focus:ring-4 focus:ring-blue-200 flex items-center space-x-2"
+            >
+              <i class="fas fa-download"></i>
+              <span>Download</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Button 2 -->
+        <div
+          class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 border border-gray-100"
+        >
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+              <div class="bg-green-100 p-3 rounded-full">
+                <i class="fas fa-map-marked-alt text-green-600 text-xl"></i>
+              </div>
+              <div>
+                <h3 class="text-lg font-semibold text-gray-800">
+                  Format Surat Pernyataan Penguasaan Fisik Bidang Tanah
+                </h3>
+                <p class="text-gray-500 text-sm">
+                  Template untuk pernyataan penguasaan fisik tanah
+                </p>
+              </div>
+            </div>
+            <a
+              href="https://docs.google.com/document/d/1b0Rtj3gFyqbd7YwfgESA4KMvdwWABCa6/edit?usp=sharing&ouid=106840474612694305461&rtpof=true&sd=true"
+              target="_blank"
+              class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 hover:scale-105 focus:ring-4 focus:ring-green-200 flex items-center space-x-2"
+            >
+              <i class="fas fa-download"></i>
+              <span>Download</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Button 3 -->
+        <div
+          class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 border border-gray-100"
+        >
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+              <div class="bg-purple-100 p-3 rounded-full">
+                <i class="fas fa-shield-alt text-purple-600 text-xl"></i>
+              </div>
+              <div>
+                <h3 class="text-lg font-semibold text-gray-800">
+                  Format Surat Pernyataan Tidak Sengketa
+                </h3>
+                <p class="text-gray-500 text-sm">Template pernyataan tidak ada sengketa hukum</p>
+              </div>
+            </div>
+            <a
+              href="https://docs.google.com/document/d/18g37Nw_5J1sBRLqKazXuLUpXoRxgJqMj/edit?usp=sharing&ouid=106840474612694305461&rtpof=true&sd=true"
+              target="_blank"
+              class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 hover:scale-105 focus:ring-4 focus:ring-purple-200 flex items-center space-x-2"
+            >
+              <i class="fas fa-download"></i>
+              <span>Download</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Info Footer -->
+      <div class="mt-12 text-center">
+        <div class="bg-white rounded-lg p-6 shadow-md">
+          <div class="flex items-center justify-center space-x-2 text-gray-600">
+            <i class="fas fa-info-circle"></i>
+            <p>
+              Semua dokumen akan terbuka di tab baru. Pastikan Anda memiliki akses Google Docs untuk
+              mengedit.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
