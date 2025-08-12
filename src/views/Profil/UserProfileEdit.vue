@@ -40,18 +40,6 @@
                 </svg>
               </div>
             </div>
-            <div class="flex-1">
-              <label for="profile_picture" class="block text-sm font-medium text-gray-700 mb-2">
-                URL Gambar Profil
-              </label>
-              <input
-                type="url"
-                id="profile_picture"
-                v-model="form.profile_picture"
-                class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-all duration-200"
-                placeholder="https://example.com/your-image.jpg"
-              />
-            </div>
           </div>
         </div>
 
