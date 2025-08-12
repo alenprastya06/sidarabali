@@ -1,12 +1,28 @@
 <template>
-  <div class="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+  <UserHeader />
+  <div class="min-h-screen bg-gray-50 sm:px-6 lg:px-8">
     <div class="max-w-4xl mx-auto">
       <!-- Header -->
       <div class="text-center mb-8">
         <h1 class="text-3xl font-light text-gray-900 tracking-wide">Profil Pengguna</h1>
         <div class="mt-2 h-px w-24 bg-gray-300 mx-auto"></div>
       </div>
-
+      <div class="pt-6">
+        <button
+          @click="$emit('edit-profile')"
+          class="inline-flex items-center px-8 py-3 bg-gray-900 text-white font-semibold rounded-xl shadow-sm hover:bg-gray-800 hover:shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+        >
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+            ></path>
+          </svg>
+          Edit Profil
+        </button>
+      </div>
       <!-- Loading State -->
       <div v-if="loading" class="text-center py-12">
         <div
@@ -355,22 +371,6 @@
         </div>
 
         <!-- Edit Button -->
-        <div class="text-center pt-6">
-          <button
-            @click="$emit('edit-profile')"
-            class="inline-flex items-center px-8 py-3 bg-gray-900 text-white font-semibold rounded-xl shadow-sm hover:bg-gray-800 hover:shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
-          >
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-              ></path>
-            </svg>
-            Edit Profil
-          </button>
-        </div>
       </div>
     </div>
   </div>
@@ -379,6 +379,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
+import UserHeader from '../UserHeader.vue'
 
 const userProfile = ref(null)
 const loading = ref(true)

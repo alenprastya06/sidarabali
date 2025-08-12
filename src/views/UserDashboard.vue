@@ -2,47 +2,205 @@
   <div class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
     <div class="bg-white shadow-lg border-b border-slate-200/60 backdrop-blur-sm">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center py-6 gap-4">
-          <div class="flex-1 text-center sm:text-left">
-            <h1
-              class="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent"
-            >
-              User Dashboard
-            </h1>
-            <p class="text-slate-600 mt-2 text-sm sm:text-base">
-              Welcome back,
-              <span class="font-semibold text-slate-800">{{ authStore.user?.username }}!</span>
-            </p>
+        <div class="flex justify-between items-center py-4">
+          <!-- Logo/Title Section -->
+          <div class="flex-shrink-0">
+            <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold">Sidarabali</h1>
           </div>
 
-          <div
-            class="flex flex-wrap items-center justify-center sm:justify-end gap-3 w-full sm:w-auto"
-          >
+          <!-- Desktop Navigation -->
+          <div class="hidden lg:flex items-center space-x-3">
             <button
               @click="DataLengkap"
-              class="inline-flex items-center justify-center flex-1 sm:flex-none px-4 py-2.5 bg-green-500 hover:from-green-600 hover:to-emerald-600 text-white font-medium rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 text-sm"
+              class="inline-flex items-center justify-center px-4 py-2.5 font-medium rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 text-sm"
             >
               Profile Pengguna
             </button>
 
             <button
               @click="kelengkapan"
-              class="inline-flex items-center justify-center flex-1 sm:flex-none px-4 py-2.5 bg-blue-500 hover:from-blue-600 hover:to-cyan-600 text-white font-medium rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 text-sm"
+              class="inline-flex items-center justify-center px-4 py-2.5 font-medium rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 text-sm"
             >
               Pengantar RT
             </button>
+
             <button
               @click="download"
-              class="inline-flex items-center justify-center flex-1 sm:flex-none px-4 py-2.5 bg-yellow-500 hover:from-blue-600 hover:to-cyan-600 text-white font-medium rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 text-sm"
+              class="inline-flex items-center justify-center px-4 py-2.5 font-medium rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-opacity-50 text-sm"
             >
               Format Dokumen
             </button>
 
             <button
               @click="authStore.logout"
-              class="inline-flex items-center justify-center flex-1 sm:flex-none px-4 py-2.5 bg-red-500 hover:from-red-600 hover:to-rose-600 text-white font-medium rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 text-sm"
+              class="inline-flex items-center justify-center px-4 py-2.5 bg-red-500 hover:bg-red-600 text-white font-medium rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 text-sm"
             >
               Logout
+            </button>
+          </div>
+
+          <!-- Mobile Menu Button -->
+          <div class="lg:hidden">
+            <button
+              @click="toggleMobileMenu"
+              type="button"
+              class="inline-flex items-center justify-center p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500 transition-colors duration-200"
+              aria-controls="mobile-menu"
+              :aria-expanded="isMobileMenuOpen"
+            >
+              <span class="sr-only">Open main menu</span>
+              <!-- Hamburger Icon -->
+              <svg
+                v-if="!isMobileMenuOpen"
+                class="block h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
+              </svg>
+              <!-- Close Icon -->
+              <svg
+                v-else
+                class="block h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Welcome Message -->
+        <div class="pb-4 lg:hidden">
+          <p class="text-slate-600 text-center text-sm">
+            Welcome back,
+            <span class="font-semibold text-slate-800">{{ authStore.user?.username }}!</span>
+          </p>
+        </div>
+
+        <!-- Desktop Welcome Message -->
+        <div class="hidden lg:block pb-4">
+          <p class="text-slate-600 text-sm">
+            Welcome back,
+            <span class="font-semibold text-slate-800">{{ authStore.user?.username }}!</span>
+          </p>
+        </div>
+      </div>
+
+      <!-- Mobile Menu -->
+      <div
+        v-show="isMobileMenuOpen"
+        class="lg:hidden border-t border-slate-200 bg-white"
+        id="mobile-menu"
+      >
+        <div class="px-4 py-3 space-y-2">
+          <button
+            @click="
+              () => {
+                DataLengkap()
+                closeMobileMenu()
+              }
+            "
+            class="w-full text-left px-4 py-3 text-slate-700 hover:bg-slate-50 hover:text-slate-900 rounded-xl transition-colors duration-200 flex items-center space-x-3"
+          >
+            <svg
+              class="w-5 h-5 text-green-500"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+              />
+            </svg>
+            <span class="font-medium">Profile Pengguna</span>
+          </button>
+
+          <button
+            @click="
+              () => {
+                kelengkapan()
+                closeMobileMenu()
+              }
+            "
+            class="w-full text-left px-4 py-3 text-slate-700 hover:bg-slate-50 hover:text-slate-900 rounded-xl transition-colors duration-200 flex items-center space-x-3"
+          >
+            <svg
+              class="w-5 h-5 text-blue-500"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              />
+            </svg>
+            <span class="font-medium">Pengantar RT</span>
+          </button>
+
+          <button
+            @click="
+              () => {
+                download()
+                closeMobileMenu()
+              }
+            "
+            class="w-full text-left px-4 py-3 text-slate-700 hover:bg-slate-50 hover:text-slate-900 rounded-xl transition-colors duration-200 flex items-center space-x-3"
+          >
+            <svg
+              class="w-5 h-5 text-yellow-500"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              />
+            </svg>
+            <span class="font-medium">Format Dokumen</span>
+          </button>
+
+          <div class="pt-2 border-t border-slate-200">
+            <button
+              @click="
+                () => {
+                  authStore.logout()
+                  closeMobileMenu()
+                }
+              "
+              class="w-full text-left px-4 py-3 text-red-600 hover:bg-red-50 hover:text-red-700 rounded-xl transition-colors duration-200 flex items-center space-x-3"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                />
+              </svg>
+              <span class="font-medium">Logout</span>
             </button>
           </div>
         </div>
@@ -1197,7 +1355,15 @@ const itemsPerPageStatusDocs = 4
 const currentPageUploadedDocs = ref(1)
 const itemsPerPageUploadedDocs = 4
 const showRTRWReminderModal = ref(false)
+const isMobileMenuOpen = ref(false)
 
+const toggleMobileMenu = () => {
+  isMobileMenuOpen.value = !isMobileMenuOpen.value
+}
+
+const closeMobileMenu = () => {
+  isMobileMenuOpen.value = false
+}
 const fetchKelengkapan = async () => {
   loadingKelengkapan.value = true
   try {

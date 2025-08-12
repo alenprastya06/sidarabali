@@ -1,5 +1,5 @@
 <template>
-  <div class="container mx-auto p-4">
+  <div class="container mx-auto">
     <div v-if="!isEditing">
       <UserProfileDisplay @edit-profile="startEditing" />
     </div>

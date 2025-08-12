@@ -1,4 +1,9 @@
+<script setup lang="ts">
+import UserHeader from './UserHeader.vue'
+</script>
+
 <template>
+  <UserHeader />
   <div class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen p-8">
     <div class="max-w-4xl mx-auto">
       <div class="text-center mb-12">

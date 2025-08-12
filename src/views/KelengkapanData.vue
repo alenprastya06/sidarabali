@@ -1,11 +1,8 @@
 <script setup>
 import { ref, reactive, onMounted, computed, watch } from 'vue'
-// Using lucide-vue-next for Vue-compatible icons
 import { Trash2, Edit3, Plus, Search, X, Save, Eye } from 'lucide-vue-next'
-
-// Assuming you have an auth store (e.g., Pinia or Vuex)
-// You might need to adjust the import path based on your project structure
-import { useAuthStore } from '@/stores/auth' // Adjust this path as necessary
+import { useAuthStore } from '@/stores/auth'
+import UserHeader from './UserHeader.vue'
 
 const kelengkapanData = ref([])
 const loading = ref(false)
@@ -13,7 +10,7 @@ const error = ref('')
 const searchQuery = ref('')
 const showModal = ref(false)
 const showViewModal = ref(false)
-const modalMode = ref('create') // 'create' or 'edit'
+const modalMode = ref('create')
 const selectedIds = ref([])
 const selectAll = ref(false)
 const currentItem = ref(null)
@@ -66,7 +63,6 @@ const fetchKelengkapanData = async () => {
     }
 
     const result = await response.json()
-    // Assuming the API returns { message: "...", count: ..., data: [...] }
     kelengkapanData.value = result.data || []
   } catch (err) {
     console.error('Error fetching kelengkapan data:', err)
@@ -77,17 +73,14 @@ const fetchKelengkapanData = async () => {
   }
 }
 
-/**
- * Creates a new kelengkapan data entry.
- */
 const createKelengkapanData = async () => {
   loading.value = true
-  error.value = '' // Clear previous errors
+  error.value = ''
   try {
     const response = await fetch(`${API_BASE_URL}/kelengkapan`, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${authStore.token}`, // Use token from authStore
+        Authorization: `Bearer ${authStore.token}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -108,11 +101,9 @@ const createKelengkapanData = async () => {
         `HTTP error! status: ${response.status} - ${errData.message || 'Unknown error'}`,
       )
     }
-
-    // After successful creation, re-fetch data to update the table
     await fetchKelengkapanData()
-    showModal.value = false // Close the modal
-    resetForm() // Reset form fields
+    showModal.value = false
+    resetForm()
   } catch (err) {
     console.error('Error creating kelengkapan data:', err)
     error.value = 'Gagal membuat data: ' + err.message
@@ -121,17 +112,14 @@ const createKelengkapanData = async () => {
   }
 }
 
-/**
- * Updates an existing kelengkapan data entry.
- */
 const updateKelengkapanData = async () => {
   loading.value = true
-  error.value = '' // Clear previous errors
+  error.value = ''
   try {
     const response = await fetch(`${API_BASE_URL}/kelengkapan/user/${id}`, {
       method: 'PUT',
       headers: {
-        Authorization: `Bearer ${authStore.token}`, // Use token from authStore
+        Authorization: `Bearer ${authStore.token}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -152,11 +140,9 @@ const updateKelengkapanData = async () => {
         `HTTP error! status: ${response.status} - ${errData.message || 'Unknown error'}`,
       )
     }
-
-    // After successful update, re-fetch data to update the table
     await fetchKelengkapanData()
-    showModal.value = false // Close the modal
-    resetForm() // Reset form fields
+    showModal.value = false
+    resetForm()
   } catch (err) {
     console.error('Error updating kelengkapan data:', err)
     error.value = 'Gagal mengupdate data: ' + err.message
@@ -165,16 +151,11 @@ const updateKelengkapanData = async () => {
   }
 }
 
-/**
- * Deletes a single kelengkapan data entry by ID.
- * @param {number} id - The ID of the entry to delete.
- */
 const deleteKelengkapanData = async (id) => {
-  // Using native browser confirm for simplicity, consider a custom modal for better UX
   if (!confirm('Apakah Anda yakin ingin menghapus data ini?')) return
 
   loading.value = true
-  error.value = '' // Clear previous errors
+  error.value = ''
   try {
     const response = await fetch(`${API_BASE_URL}/kelengkapan/${id}`, {
       method: 'DELETE',
@@ -190,10 +171,7 @@ const deleteKelengkapanData = async (id) => {
         `HTTP error! status: ${response.status} - ${errData.message || 'Unknown error'}`,
       )
     }
-
-    // After successful deletion, re-fetch data to update the table
     await fetchKelengkapanData()
-    // Remove the ID from selectedIds if it was selected
     selectedIds.value = selectedIds.value.filter((selectedId) => selectedId !== id)
   } catch (err) {
     console.error('Error deleting kelengkapan data:', err)
@@ -203,9 +181,6 @@ const deleteKelengkapanData = async (id) => {
   }
 }
 
-/**
- * Handles the submission of the create/edit form.
- */
 const handleSubmit = () => {
   if (modalMode.value === 'create') {
     createKelengkapanData()
@@ -214,19 +189,12 @@ const handleSubmit = () => {
   }
 }
 
-/**
- * Opens the create modal and resets the form.
- */
 const openCreateModal = () => {
   modalMode.value = 'create'
   resetForm()
   showModal.value = true
 }
 
-/**
- * Opens the edit modal and populates the form with the item's data.
- * @param {object} item - The kelengkapan data item to edit.
- */
 const openEditModal = (item) => {
   modalMode.value = 'edit'
   formData.id = item.id
@@ -234,7 +202,6 @@ const openEditModal = (item) => {
   formData.rt = item.rt
   formData.rw = item.rw
   formData.no_surat_pengantar = item.no_surat_pengantar
-  // Format date to YYYY-MM-DD for input type="date"
   formData.tanggal_surat_pengantar = item.tanggal_surat_pengantar
     ? new Date(item.tanggal_surat_pengantar).toISOString().split('T')[0]
     : ''
@@ -244,18 +211,11 @@ const openEditModal = (item) => {
   showModal.value = true
 }
 
-/**
- * Opens the view detail modal and sets the current item.
- * @param {object} item - The kelengkapan data item to view.
- */
 const openViewModal = (item) => {
   currentItem.value = item
   showViewModal.value = true
 }
 
-/**
- * Closes any open modal and resets the form/current item.
- */
 const closeModal = () => {
   showModal.value = false
   showViewModal.value = false
@@ -263,9 +223,6 @@ const closeModal = () => {
   currentItem.value = null
 }
 
-/**
- * Toggles the selection of all filtered items.
- */
 const toggleSelectAll = () => {
   if (selectAll.value) {
     selectedIds.value = filteredData.value.map((item) => item.id)
@@ -274,26 +231,17 @@ const toggleSelectAll = () => {
   }
 }
 
-/**
- * Toggles the selection of a single item.
- * @param {number} id - The ID of the item to toggle.
- */
 const toggleSelect = (id) => {
   const index = selectedIds.value.indexOf(id)
   if (index > -1) {
-    selectedIds.value.splice(index, 1) // Remove if already selected
+    selectedIds.value.splice(index, 1)
   } else {
     selectedIds.value.push(id) // Add if not selected
   }
-  // Update selectAll checkbox based on current selections
   selectAll.value =
     selectedIds.value.length === filteredData.value.length && filteredData.value.length > 0
 }
 
-/**
- * Computed property to filter kelengkapan data based on search query.
- * It reacts to changes in `kelengkapanData` and `searchQuery`.
- */
 const filteredData = computed(() => {
   if (!searchQuery.value.trim()) {
     return kelengkapanData.value
@@ -311,11 +259,6 @@ const filteredData = computed(() => {
   }
 })
 
-/**
- * Formats a date string into a localized short date string.
- * @param {string} dateString - The date string to format.
- * @returns {string} Formatted date or '-' if invalid.
- */
 const formatDate = (dateString) => {
   if (!dateString) return '-'
   try {
@@ -326,49 +269,42 @@ const formatDate = (dateString) => {
   }
 }
 
-/**
- * Formats a number as currency (or a general number with ID locale).
- * @param {number} amount - The number to format.
- * @returns {string} Formatted number or '-' if invalid.
- */
 const formatCurrency = (amount) => {
   if (amount === null || amount === undefined || isNaN(amount)) return '-'
   return new Intl.NumberFormat('id-ID').format(amount)
 }
 
-// Watchers to update selectAll state when filteredData changes (e.g., after fetch or search)
 watch(
   filteredData,
   () => {
-    // If all currently filtered items are selected, set selectAll to true
     selectAll.value =
       filteredData.value.length > 0 && selectedIds.value.length === filteredData.value.length
   },
   { deep: true },
-) // Deep watch for changes within the array items
+)
 
-// Fetch data when the component is mounted
 onMounted(() => {
   fetchKelengkapanData()
 })
 </script>
 
 <template>
+  <UserHeader />
   <div class="min-h-screen bg-gray-50 p-6 font-inter">
     <div class="max-w-7xl mx-auto">
       <div class="bg-white rounded-lg shadow-sm">
         <!-- Header -->
         <div class="px-6 py-4 border-b border-gray-200 rounded-t-lg">
           <div class="flex justify-between items-center">
-            <h1 class="text-2xl font-semibold text-gray-900">Data Kelengkapan</h1>
-            <button
-              @click="openCreateModal"
-              class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors shadow-md"
-            >
-              <Plus class="w-4 h-4 mr-2" />
-              Tambah Data
-            </button>
+            <h1 class="text-xl text-gray-900">Data Kelengkapan Dari RT</h1>
           </div>
+          <button
+            @click="openCreateModal"
+            class="inline-flex mt-3 items-center px-2 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors shadow-md"
+          >
+            <Plus class="w-4 h-4 mr-2" />
+            Tambah Data
+          </button>
         </div>
 
         <!-- Search and Actions -->
@@ -595,7 +531,7 @@ onMounted(() => {
               </div>
 
               <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
+                <div class="hidden">
                   <label for="user_id" class="block text-sm font-medium text-gray-700 mb-1"
                     >User ID</label
                   >
