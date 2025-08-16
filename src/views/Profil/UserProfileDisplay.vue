@@ -1,16 +1,11 @@
 <template>
   <UserHeader />
   <div class="min-h-screen bg-gray-50 sm:px-6 lg:px-8">
-    <div class="max-w-4xl mx-auto">
-      <!-- Header -->
-      <div class="text-center mb-8">
-        <h1 class="text-3xl font-light text-gray-900 tracking-wide">Profil Pengguna</h1>
-        <div class="mt-2 h-px w-24 bg-gray-300 mx-auto"></div>
-      </div>
+    <div class="max-w-7xl mx-auto">
       <div class="pt-6">
         <button
           @click="$emit('edit-profile')"
-          class="inline-flex items-center px-8 py-3 bg-gray-900 text-white font-semibold rounded-xl shadow-sm hover:bg-gray-800 hover:shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+          class="inline-flex items-center px-8 py-3 text-blue-600 font-semibold rounded-xl shadow-sm hover:shadow-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
         >
           <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
@@ -65,22 +60,35 @@
       </div>
 
       <div v-else-if="userProfile" class="space-y-6">
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          <div class="p-8 text-center">
-            <div class="relative inline-block">
-              <div
-                class="absolute -bottom-1 -right-1 w-8 h-8 bg-green-500 rounded-full ring-4 ring-white"
-              ></div>
-            </div>
-            <h2 class="mt-4 text-2xl font-semibold text-gray-900">
-              {{ userProfile.nama_lengkap || 'Nama tidak tersedia' }}
-            </h2>
-            <p class="text-gray-500 font-medium">{{ userProfile.username || '-' }}</p>
-          </div>
-        </div>
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden"></div>
 
         <!-- Profile Information Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div
+            class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow duration-200"
+          >
+            <div class="flex items-center mb-3">
+              <div class="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center mr-3">
+                <svg
+                  class="w-5 h-5 text-blue-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                  ></path>
+                </svg>
+              </div>
+              <div>
+                <p class="text-sm font-medium text-gray-500">Nama Lengkap</p>
+                <p class="text-gray-900 font-semibold">{{ userProfile.nama_lengkap || '-' }}</p>
+              </div>
+            </div>
+          </div>
           <!-- Email -->
           <div
             class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow duration-200"
@@ -394,7 +402,7 @@ const fetchProfile = async () => {
   try {
     // Assuming your authentication token is stored in localStorage or a similar mechanism
     const token = localStorage.getItem('token')
-    const response = await axios.get('https://bitwize.cloud/api/profile', {
+    const response = await axios.get('http://localhost:3001/api/profile', {
       headers: {
         Authorization: `Bearer ${token}`,
       },

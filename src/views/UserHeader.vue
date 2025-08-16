@@ -1,106 +1,152 @@
+<script setup>
+import { ref, defineEmits, computed, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import axios from 'axios'
+const router = useRouter()
+const route = useRoute()
+
+const props = defineProps({
+  navigationItems: {
+    type: Array,
+    default: () => [
+      { id: 'dashboard', label: 'Dashboard', icon: 'fas fa-home', active: true },
+      { id: 'berkas-saya', label: 'Berkas Saya', icon: 'fas fa-folder', active: false },
+      { id: 'akun-saya', label: 'Akun Saya', icon: 'fas fa-user', active: false },
+    ],
+  },
+})
+
+const emit = defineEmits(['tab-change', 'create-request'])
+const isMobileMenuOpen = ref(false)
+
+const userProfile = ref({
+  username: 'Memuat...',
+})
+
+const fetchUserProfile = async () => {
+  try {
+    const token = localStorage.getItem('token')
+    if (!token) {
+      console.error('Token tidak ditemukan. Mohon login ulang.')
+      return
+    }
+
+    const response = await axios.get('http://localhost:3001/api/profile', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+
+    userProfile.value = response.data.user
+  } catch (error) {
+    console.error('Gagal mengambil data profil:', error)
+    userProfile.value.username = 'Gagal memuat'
+  }
+}
+
+onMounted(() => {
+  fetchUserProfile()
+})
+
+const setActiveTab = (tabId) => {
+  router.push(`/user/${tabId}`)
+  emit('tab-change', tabId)
+  isMobileMenuOpen.value = false
+}
+
+const createNewRequest = () => {
+  router.push('/user/halaman-permohonan')
+  isMobileMenuOpen.value = false
+}
+
+const goToPemilikDokumen = () => {
+  router.push('/user/pemilik-dokumen')
+  isMobileMenuOpen.value = false
+}
+
+const toggleMobileMenu = () => {
+  isMobileMenuOpen.value = !isMobileMenuOpen.value
+}
+
+const handleLogout = () => {
+  localStorage.removeItem('token')
+  localStorage.removeItem('id')
+  router.push('/')
+}
+
+// Fixed isActiveTab function
+const isActiveTab = (itemId) => {
+  // Handle exact route matching
+  const expectedPath = `/user/${itemId}`
+  return route.path === expectedPath || route.name === itemId
+}
+</script>
+
 <template>
-  <div class="bg-white shadow-lg border-b border-slate-200/60 backdrop-blur-sm">
+  <nav class="bg-white shadow-md border-b border-gray-200">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex justify-between items-center py-4">
-        <!-- Logo/Title Section -->
-        <div class="flex-shrink-0">
-          <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold">Sidarabali</h1>
+      <div class="hidden md:flex justify-between items-center h-16">
+        <div class="flex items-center">
+          <span class="text-xl font-bold text-orange-600 mr-8">SIDARABALI</span>
         </div>
 
-        <!-- Desktop Navigation -->
-        <div class="hidden lg:flex items-center space-x-3">
+        <div class="flex-grow flex justify-center">
+          <div class="flex space-x-2">
+            <button
+              v-for="item in navigationItems"
+              :key="item.id"
+              @click="setActiveTab(item.id)"
+              :class="[
+                'flex items-center px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-colors duration-200',
+                isActiveTab(item.id)
+                  ? 'bg-orange-600 text-white shadow-md hover:bg-orange-700'
+                  : 'text-gray-700 hover:bg-gray-200 hover:text-gray-900',
+              ]"
+            >
+              <i :class="item.icon" class="mr-2"></i>
+              {{ item.label }}
+            </button>
+          </div>
+        </div>
+
+        <div class="flex items-center space-x-4 ml-8">
           <button
-            @click="pengajuan"
-            class="inline-flex items-center justify-center px-4 py-2.5 font-medium rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-opacity-50 text-sm"
+            @click="createNewRequest"
+            class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-md text-sm font-semibold transition-colors duration-200 flex items-center shadow"
           >
-            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M12 4v16m8-8H4"
-              />
-            </svg>
-            Pengajuan
+            <i class="fas fa-plus mr-2"></i>
+            Buat Permohonan Baru
           </button>
 
+          <div class="bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-sm font-semibold">
+            {{ userProfile.username }}
+          </div>
           <button
-            @click="DataLengkap"
-            class="inline-flex items-center justify-center px-4 py-2.5 font-medium rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 text-sm"
+            @click="handleLogout"
+            class="text-red-600 px-4 py-2 rounded-md text-sm font-semibold transition-colors duration-200 flex items-center shadow"
+            title="Logout"
           >
-            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-              />
-            </svg>
-            Profile Pengguna
-          </button>
-
-          <button
-            @click="kelengkapan"
-            class="inline-flex items-center justify-center px-4 py-2.5 font-medium rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 text-sm"
-          >
-            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-              />
-            </svg>
-            Pengantar RT
-          </button>
-
-          <button
-            @click="download"
-            class="inline-flex items-center justify-center px-4 py-2.5 font-medium rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-opacity-50 text-sm"
-          >
-            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-              />
-            </svg>
-            Format Dokumen
-          </button>
-
-          <button
-            @click="logout"
-            class="inline-flex items-center justify-center px-4 py-2.5 bg-red-500 hover:bg-red-600 text-white font-medium rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 text-sm"
-          >
-            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-              />
-            </svg>
+            <i class="fas fa-sign-out-alt mr-2"></i>
             Logout
           </button>
         </div>
+      </div>
 
-        <!-- Mobile Menu Button -->
-        <div class="lg:hidden">
+      <div class="md:hidden">
+        <div class="flex justify-between items-center h-16">
+          <div class="flex items-center">
+            <span class="text-xl font-bold text-orange-600">SIDARABALI</span>
+          </div>
           <button
             @click="toggleMobileMenu"
-            type="button"
-            class="inline-flex items-center justify-center p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500 transition-colors duration-200"
-            aria-controls="mobile-menu"
+            class="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-gray-900 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-orange-500 transition-colors duration-200"
             :aria-expanded="isMobileMenuOpen"
           >
-            <span class="sr-only">{{
-              isMobileMenuOpen ? 'Close main menu' : 'Open main menu'
-            }}</span>
-            <!-- Hamburger Icon -->
+            <span class="sr-only">Open main menu</span>
             <svg
-              v-if="!isMobileMenuOpen"
-              class="block h-6 w-6"
+              :class="{ hidden: isMobileMenuOpen, block: !isMobileMenuOpen }"
+              class="h-6 w-6"
+              xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -112,8 +158,14 @@
                 d="M4 6h16M4 12h16M4 18h16"
               />
             </svg>
-            <!-- Close Icon -->
-            <svg v-else class="block h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg
+              :class="{ block: isMobileMenuOpen, hidden: !isMobileMenuOpen }"
+              class="h-6 w-6"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
@@ -123,208 +175,53 @@
             </svg>
           </button>
         </div>
-      </div>
-
-      <!-- Welcome Message -->
-      <div class="pb-4">
-        <p class="text-slate-600 text-center lg:text-left text-sm">
-          Welcome back,
-          <span class="font-semibold text-slate-800"
-            >{{ authStore.user?.username || 'User' }}!</span
-          >
-        </p>
-      </div>
-    </div>
-
-    <!-- Mobile Menu -->
-    <transition
-      enter-active-class="transition duration-200 ease-out"
-      enter-from-class="transform scale-95 opacity-0"
-      enter-to-class="transform scale-100 opacity-100"
-      leave-active-class="transition duration-75 ease-in"
-      leave-from-class="transform scale-100 opacity-100"
-      leave-to-class="transform scale-95 opacity-0"
-    >
-      <div
-        v-show="isMobileMenuOpen"
-        class="lg:hidden border-t border-slate-200 bg-white"
-        id="mobile-menu"
-      >
-        <div class="px-4 py-3 space-y-2">
-          <button
-            @click="
-              () => {
-                pengajuan()
-                closeMobileMenu()
-              }
-            "
-            class="w-full text-left px-4 py-3 text-slate-700 hover:bg-slate-50 hover:text-slate-900 rounded-xl transition-colors duration-200 flex items-center space-x-3 font-medium"
-          >
-            <svg
-              class="w-5 h-5 text-purple-500"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M12 4v16m8-8H4"
-              />
-            </svg>
-            <span>Pengajuan</span>
-          </button>
-
-          <button
-            @click="
-              () => {
-                DataLengkap()
-                closeMobileMenu()
-              }
-            "
-            class="w-full text-left px-4 py-3 text-slate-700 hover:bg-slate-50 hover:text-slate-900 rounded-xl transition-colors duration-200 flex items-center space-x-3 font-medium"
-          >
-            <svg
-              class="w-5 h-5 text-green-500"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-              />
-            </svg>
-            <span>Profile Pengguna</span>
-          </button>
-
-          <button
-            @click="
-              () => {
-                kelengkapan()
-                closeMobileMenu()
-              }
-            "
-            class="w-full text-left px-4 py-3 text-slate-700 hover:bg-slate-50 hover:text-slate-900 rounded-xl transition-colors duration-200 flex items-center space-x-3 font-medium"
-          >
-            <svg
-              class="w-5 h-5 text-blue-500"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-              />
-            </svg>
-            <span>Pengantar RT</span>
-          </button>
-
-          <button
-            @click="
-              () => {
-                download()
-                closeMobileMenu()
-              }
-            "
-            class="w-full text-left px-4 py-3 text-slate-700 hover:bg-slate-50 hover:text-slate-900 rounded-xl transition-colors duration-200 flex items-center space-x-3 font-medium"
-          >
-            <svg
-              class="w-5 h-5 text-yellow-500"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-              />
-            </svg>
-            <span>Format Dokumen</span>
-          </button>
-
-          <div class="pt-2 border-t border-slate-200">
+        <div
+          :class="{ block: isMobileMenuOpen, hidden: !isMobileMenuOpen }"
+          class="border-t border-gray-200 bg-white"
+        >
+          <div class="px-2 pt-2 pb-3 space-y-1">
             <button
-              @click="
-                () => {
-                  logout()
-                  closeMobileMenu()
-                }
-              "
-              class="w-full text-left px-4 py-3 text-red-600 hover:bg-red-50 hover:text-red-700 rounded-xl transition-colors duration-200 flex items-center space-x-3 font-medium"
+              v-for="item in navigationItems"
+              :key="item.id"
+              @click="setActiveTab(item.id)"
+              :class="[
+                'flex items-center w-full px-3 py-3 rounded-md text-base font-medium transition-colors duration-200',
+                isActiveTab(item.id)
+                  ? 'bg-orange-600 text-white shadow-sm'
+                  : 'text-gray-700 hover:bg-gray-200 hover:text-gray-900',
+              ]"
             >
-              <svg
-                class="w-5 h-5 text-red-500"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                />
-              </svg>
-              <span>Logout</span>
+              <i :class="item.icon" class="mr-3 w-5"></i>
+              {{ item.label }}
             </button>
+          </div>
+          <div class="pt-4 pb-3 border-t border-gray-200">
+            <div class="px-2 space-y-1">
+              <button
+                @click="createNewRequest"
+                class="flex items-center w-full bg-orange-500 hover:bg-orange-600 text-white px-3 py-3 rounded-md text-base font-semibold transition-colors duration-200 shadow"
+              >
+                <i class="fas fa-plus mr-3 w-5"></i>
+                Buat Permohonan Baru
+              </button>
+              <button
+                @click="goToPemilikDokumen"
+                class="flex items-center w-full bg-blue-500 hover:bg-blue-600 text-white px-3 py-3 rounded-md text-base font-semibold transition-colors duration-200 shadow"
+              >
+                <i class="fas fa-file-alt mr-3 w-5"></i>
+                Buat Pengajuan
+              </button>
+              <button
+                @click="handleLogout"
+                class="flex items-center w-full bg-red-500 hover:bg-red-600 text-white px-3 py-3 rounded-md text-base font-semibold transition-colors duration-200 shadow"
+              >
+                <i class="fas fa-sign-out-alt mr-3 w-5"></i>
+                Logout
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </transition>
-  </div>
+    </div>
+  </nav>
 </template>
-
-<script setup>
-import { ref } from 'vue'
-import { useAuthStore } from '../stores/auth'
-import { useRouter } from 'vue-router'
-
-const router = useRouter()
-const authStore = useAuthStore()
-
-// Mobile menu state
-const isMobileMenuOpen = ref(false)
-
-// Methods
-const toggleMobileMenu = () => {
-  isMobileMenuOpen.value = !isMobileMenuOpen.value
-}
-
-const closeMobileMenu = () => {
-  isMobileMenuOpen.value = false
-}
-
-const pengajuan = () => {
-  router.push('/user/dashboard')
-}
-
-const DataLengkap = () => {
-  router.push('/user-profile')
-}
-
-const kelengkapan = () => {
-  const id = localStorage.getItem('id')
-  router.push(`/user/kelengkapan/${id}`)
-}
-
-const download = () => {
-  router.push('/download-template')
-}
-
-const logout = () => {
-  authStore.logout()
-}
-</script>
-
-<style scoped>
-/* Optional: Add any custom styles here */
-</style>

@@ -42,7 +42,7 @@ const resetForm = () => {
   formData.alamat_lahan = ''
 }
 
-const API_BASE_URL = 'https://bitwize.cloud/api'
+const API_BASE_URL = 'http://localhost:3001/api'
 
 const fetchKelengkapanData = async () => {
   loading.value = true

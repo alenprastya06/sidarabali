@@ -1,11 +1,7 @@
 <template>
-  <div class="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+  <UserHeader />
+  <div class="min-h-screen bg-gray-50">
     <div class="max-w-4xl mx-auto">
-      <div class="text-center mb-8">
-        <h1 class="text-3xl font-light text-gray-900 tracking-wide">Edit Profil</h1>
-        <div class="mt-2 h-px w-24 bg-gray-300 mx-auto"></div>
-      </div>
-
       <div v-if="loadingProfile" class="text-center py-12">
         <div
           class="inline-block animate-spin rounded-full h-8 w-8 border-2 border-gray-300 border-t-gray-900"
@@ -14,36 +10,11 @@
       </div>
 
       <form v-else @submit.prevent="submitProfileUpdate" class="space-y-8">
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-          <div class="flex items-center space-x-6">
-            <div class="relative">
-              <img
-                :src="form.profile_picture || 'https://via.placeholder.com/150'"
-                alt="Profile Preview"
-                class="w-24 h-24 rounded-full object-cover ring-4 ring-white shadow-lg"
-              />
-              <div
-                class="absolute -bottom-1 -right-1 w-6 h-6 bg-blue-500 rounded-full ring-2 ring-white flex items-center justify-center"
-              >
-                <svg
-                  class="w-3 h-3 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
-                  ></path>
-                </svg>
-              </div>
-            </div>
-          </div>
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-2">
+          <div class="flex items-center space-x-6"></div>
         </div>
 
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100">
           <h3 class="text-lg font-semibold text-gray-900 mb-6 flex items-center">
             <div class="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center mr-3">
               <svg
@@ -378,6 +349,7 @@
 import { ref, onMounted, watch } from 'vue'
 import axios from 'axios'
 import { SquareCheckBig } from 'lucide-vue-next' // Impor ikon yang Anda inginkan
+import UserHeader from '../UserHeader.vue'
 
 const props = defineProps({
   initialProfile: {
@@ -420,7 +392,7 @@ const fetchProfile = async () => {
       throw new Error('Token tidak ditemukan')
     }
 
-    const response = await axios.get('https://bitwize.cloud/api/profile', {
+    const response = await axios.get('http://localhost:3001/api/profile', {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -472,7 +444,7 @@ const submitProfileUpdate = async () => {
       }
     }
 
-    const response = await axios.patch('https://bitwize.cloud/api/profile', payload, {
+    const response = await axios.patch('http://localhost:3001/api/profile', payload, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

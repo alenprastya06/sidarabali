@@ -11,6 +11,8 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^7.0.0",
+    "@heroicons/vue": "^2.2.0",
     "axios": "^1.10.0",
     "install": "^0.13.0",
     "lucide-vue-next": "^0.525.0",
@@ -30,6 +32,7 @@
     "globals": "^16.2.0",
     "prettier": "3.5.3",
     "vite": "^7.0.0",
-    "vite-plugin-vue-devtools": "^7.7.7"
+    "vite-plugin-vue-devtools": "^7.7.7",
+    "vue-eslint-parser": "^10.2.0"
   }
 }
