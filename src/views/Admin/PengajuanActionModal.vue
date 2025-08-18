@@ -248,6 +248,77 @@
           </div>
         </div>
 
+        <!-- Reject Pengajuan Modal -->
+        <div
+          v-if="showRejectModal"
+          class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-60"
+        >
+          <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <h4 class="text-lg font-medium text-gray-900 mb-4">Tolak Pengajuan</h4>
+            <p class="text-sm text-gray-600 mb-4">
+              Apakah Anda yakin ingin menolak pengajuan
+              <strong>{{ pengajuan.kode_pengajuan }}</strong
+              >?
+            </p>
+
+            <div class="space-y-3">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                  Alasan Penolakan <span class="text-red-500">*</span>
+                </label>
+                <textarea
+                  v-model="rejectReason"
+                  rows="3"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 text-sm"
+                  placeholder="Jelaskan alasan penolakan pengajuan..."
+                ></textarea>
+                <p v-if="rejectReasonError" class="mt-1 text-xs text-red-500">
+                  {{ rejectReasonError }}
+                </p>
+              </div>
+
+              <div class="flex space-x-2">
+                <button
+                  @click="confirmRejectPengajuan"
+                  :disabled="rejectingPengajuan || !rejectReason.trim()"
+                  class="flex-1 px-4 py-2 text-sm font-medium bg-red-600 hover:bg-red-700 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  <div class="flex items-center justify-center">
+                    <svg
+                      v-if="rejectingPengajuan"
+                      class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        class="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        stroke-width="4"
+                      ></circle>
+                      <path
+                        class="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                    {{ rejectingPengajuan ? 'Menolak...' : 'Konfirmasi Tolak' }}
+                  </div>
+                </button>
+                <button
+                  @click="closeRejectModal"
+                  :disabled="rejectingPengajuan"
+                  class="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 transition-colors"
+                >
+                  Batal
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div v-if="successMessage" class="mt-4 p-3 bg-green-50 border border-green-200 rounded-md">
           <div class="flex">
             <svg class="w-5 h-5 text-green-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
@@ -292,7 +363,26 @@
           </div>
         </div>
 
-        <div class="mt-6 flex justify-end">
+        <!-- Action Buttons -->
+        <div class="mt-6 flex justify-between">
+          <!-- Button Tolak Pengajuan -->
+          <button
+            @click="openRejectModal"
+            :disabled="rejectingPengajuan"
+            class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-red-700 bg-white border border-red-300 rounded-md hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+            {{ rejectingPengajuan ? 'Menolak...' : 'Tolak Pengajuan' }}
+          </button>
+
+          <!-- Button Tutup -->
           <button
             @click="$emit('close')"
             type="button"
@@ -317,7 +407,7 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['close', 'documentUpdated'])
+const emit = defineEmits(['close', 'documentUpdated', 'pengajuanRejected'])
 
 const processingDocs = ref(new Set())
 const actionTypes = ref(new Map())
@@ -328,6 +418,13 @@ const adminNote = ref('')
 const noteError = ref('')
 const successMessage = ref('')
 const errorMessage = ref('')
+
+// Reject Pengajuan State
+const showRejectModal = ref(false)
+const rejectingPengajuan = ref(false)
+const rejectReason = ref('')
+const rejectReasonError = ref('')
+
 const token = localStorage.getItem('token')
 
 // Computed properties
@@ -417,6 +514,88 @@ const closeActionForm = () => {
   selectedAction.value = ''
   adminNote.value = ''
   noteError.value = ''
+}
+
+// Reject Pengajuan Methods
+const openRejectModal = () => {
+  rejectReason.value = ''
+  rejectReasonError.value = ''
+  showRejectModal.value = true
+}
+
+const closeRejectModal = () => {
+  showRejectModal.value = false
+  rejectReason.value = ''
+  rejectReasonError.value = ''
+}
+
+const confirmRejectPengajuan = async () => {
+  if (!rejectReason.value.trim()) {
+    rejectReasonError.value = 'Alasan penolakan wajib diisi'
+    return
+  }
+
+  try {
+    rejectingPengajuan.value = true
+    rejectReasonError.value = ''
+    errorMessage.value = ''
+
+    const pengajuanId = props.pengajuan.id_pengajuan || props.pengajuan.id
+    if (!pengajuanId) {
+      throw new Error('ID Pengajuan tidak ditemukan')
+    }
+
+    const response = await axios.put(
+      `http://localhost:3000/api/pengajuan/${pengajuanId}/reject`,
+      {
+        admin_note: rejectReason.value.trim(),
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        timeout: 30000,
+      },
+    )
+
+    successMessage.value = `Pengajuan ${props.pengajuan.kode_pengajuan} berhasil ditolak`
+
+    setTimeout(() => {
+      successMessage.value = ''
+    }, 3000)
+
+    emit('pengajuanRejected', response.data)
+    closeRejectModal()
+
+    // Optionally close the main modal after a delay
+    setTimeout(() => {
+      emit('close')
+    }, 2000)
+  } catch (error) {
+    console.error('Error rejecting pengajuan:', error)
+    let errorMsg = ''
+
+    if (error.code === 'ECONNABORTED') {
+      errorMsg = 'Timeout: Server terlalu lama merespons'
+    } else if (error.response?.status === 404) {
+      errorMsg = 'Pengajuan tidak ditemukan'
+    } else if (error.response?.status === 403) {
+      errorMsg = 'Anda tidak memiliki hak akses untuk menolak pengajuan ini'
+    } else if (error.response?.status === 400) {
+      errorMsg = error.response.data?.message || 'Pengajuan tidak dapat ditolak'
+    } else {
+      errorMsg = `Gagal menolak pengajuan: ${error.response?.data?.message || error.message}`
+    }
+
+    errorMessage.value = errorMsg
+
+    setTimeout(() => {
+      errorMessage.value = ''
+    }, 5000)
+  } finally {
+    rejectingPengajuan.value = false
+  }
 }
 
 const confirmDocumentAction = async () => {
@@ -509,5 +688,18 @@ const confirmDocumentAction = async () => {
 
 .z-60 {
   z-index: 60;
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 </style>

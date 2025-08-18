@@ -583,8 +583,7 @@
 </template>
 
 <script setup>
-import { ref, inject, computed, watch, onMounted } from 'vue'
-import axios from 'axios'
+import { ref, inject, computed, watch } from 'vue'
 
 const props = defineProps({
   idPengajuan: {
@@ -608,10 +607,10 @@ const owner = ref({
   nama: '',
   npwp: '',
   tanggal_lahir: '',
-  agama: '', // New field
-  kewarganegaraan: 'Indonesia', // New field with default value
-  alamat: '', // New field
-  pekerjaan: '', // New field
+  agama: '',
+  kewarganegaraan: 'Indonesia',
+  alamat: '',
+  pekerjaan: '',
 })
 
 const lahan = ref({
@@ -654,50 +653,6 @@ const isLahanValid = computed(() => {
     lahan.value.wilayah_kota
   )
 })
-
-const getIdPengajuan = () => {
-  return props.idPengajuan || injectedIdPengajuan?.value || null
-}
-
-const fetchExistingData = async (idPengajuan) => {
-  if (!idPengajuan) {
-    return
-  }
-
-  const token = localStorage.getItem('token')
-  try {
-    const response = await axios.get('http://localhost:3001/api/documents/me/status', {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-    const statusData = response.data
-
-    const existingSubmission = statusData.find((item) => item.id_pengajuan === Number(idPengajuan))
-
-    if (existingSubmission) {
-      if (existingSubmission.owner) {
-        owner.value = {
-          ...existingSubmission.owner,
-          tanggal_lahir: existingSubmission.owner.tanggal_lahir
-            ? new Date(existingSubmission.owner.tanggal_lahir).toISOString().split('T')[0]
-            : '',
-        }
-        validateAndEmitOwner()
-      }
-      if (existingSubmission.lahan) {
-        lahan.value = { ...existingSubmission.lahan }
-        validateAndEmitLahan()
-      }
-    } else {
-      // Jika tidak ada data, reset formulir
-      resetForms()
-    }
-  } catch (error) {
-    console.error('Error fetching existing data:', error)
-    showMessage('error', 'Gagal memuat data sebelumnya.')
-  }
-}
 
 const resetForms = () => {
   owner.value = {
@@ -777,23 +732,14 @@ const submitLahan = async () => {
   }
 }
 
-// Watcher untuk memuat data ketika idPengajuan berubah
+// Watcher untuk reset form ketika idPengajuan berubah
 watch(
   () => props.idPengajuan || injectedIdPengajuan?.value,
   (newId) => {
-    if (newId) {
-      fetchExistingData(newId)
-    } else {
+    if (!newId) {
       resetForms()
     }
   },
   { immediate: true },
 )
-
-onMounted(() => {
-  const currentId = getIdPengajuan()
-  if (currentId) {
-    fetchExistingData(currentId)
-  }
-})
 </script>

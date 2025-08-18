@@ -10,20 +10,9 @@
 
     <div class="relative max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 min-h-screen">
       <!-- Left brand/hero -->
-      <section
-        class="hidden lg:flex flex-col justify-between p-12 text-white"
-        style="background-color: #000080"
-      >
+      <section class="hidden lg:flex flex-col justify-between p-12 text-white bg-blue-900">
         <div>
           <div class="flex items-center space-x-3">
-            <svg class="h-9 w-9 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M13 10V3L4 14h7v7l9-11h-7z"
-              />
-            </svg>
             <h1 class="text-2xl font-bold tracking-tight">Sidarabali</h1>
           </div>
           <h2 class="mt-10 text-4xl font-extrabold leading-tight">Selamat datang kembali.</h2>
@@ -60,19 +49,11 @@
           <div class="bg-white/90 backdrop-blur rounded-2xl shadow-xl border border-gray-100 p-8">
             <div class="mb-8">
               <div class="flex items-center space-x-3">
-                <svg
-                  class="h-8 w-8 text-blue-600"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M13 10V3L4 14h7v7l9-11h-7z"
-                  />
-                </svg>
+                <img
+                  class="w-10 h-10"
+                  src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/Coat_of_arms_of_Jakarta.svg/1814px-Coat_of_arms_of_Jakarta.svg.png"
+                  alt=""
+                />
                 <h2 class="text-2xl font-bold text-gray-900">Masuk ke akun</h2>
               </div>
               <p class="mt-2 text-sm text-gray-500">

@@ -20,7 +20,12 @@ const emit = defineEmits(['tab-change', 'create-request'])
 const isMobileMenuOpen = ref(false)
 
 const userProfile = ref({
+  id: null,
   username: 'Memuat...',
+  email: '',
+  role: '',
+  created_at: null,
+  updated_at: null,
 })
 
 const fetchUserProfile = async () => {
@@ -28,19 +33,40 @@ const fetchUserProfile = async () => {
     const token = localStorage.getItem('token')
     if (!token) {
       console.error('Token tidak ditemukan. Mohon login ulang.')
+      userProfile.value.username = 'Token tidak tersedia'
       return
     }
 
-    const response = await axios.get('http://localhost:3001/api/profile', {
+    const response = await axios.get('http://localhost:3000/api/profile', {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     })
 
-    userProfile.value = response.data.user
+    // Update to match the actual API response structure
+    if (response.data) {
+      userProfile.value = {
+        id: response.data.id,
+        username: response.data.username,
+        email: response.data.email,
+        role: response.data.role,
+        created_at: response.data.created_at,
+        updated_at: response.data.updated_at,
+      }
+    }
   } catch (error) {
     console.error('Gagal mengambil data profil:', error)
-    userProfile.value.username = 'Gagal memuat'
+
+    // Handle different error scenarios
+    if (error.response?.status === 401) {
+      userProfile.value.username = 'Sesi berakhir'
+      // Optionally redirect to login
+      // router.push('/')
+    } else if (error.response?.status === 404) {
+      userProfile.value.username = 'Profil tidak ditemukan'
+    } else {
+      userProfile.value.username = 'Gagal memuat'
+    }
   }
 }
 
@@ -80,6 +106,26 @@ const isActiveTab = (itemId) => {
   const expectedPath = `/user/${itemId}`
   return route.path === expectedPath || route.name === itemId
 }
+
+// Computed property to display user info
+const displayUserInfo = computed(() => {
+  if (userProfile.value.username === 'Memuat...') {
+    return 'Memuat...'
+  }
+  return userProfile.value.username
+})
+
+// Computed property for user role badge color
+const roleColor = computed(() => {
+  switch (userProfile.value.role) {
+    case 'admin':
+      return 'bg-purple-100 text-purple-800'
+    case 'user':
+      return 'bg-orange-100 text-orange-800'
+    default:
+      return 'bg-gray-100 text-gray-800'
+  }
+})
 </script>
 
 <template>
@@ -118,8 +164,8 @@ const isActiveTab = (itemId) => {
             Buat Permohonan Baru
           </button>
 
-          <div class="bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-sm font-semibold">
-            {{ userProfile.username }}
+          <div :class="['px-3 py-1 rounded-full text-sm font-semibold', roleColor]">
+            {{ displayUserInfo }}
           </div>
           <button
             @click="handleLogout"
@@ -196,6 +242,17 @@ const isActiveTab = (itemId) => {
             </button>
           </div>
           <div class="pt-4 pb-3 border-t border-gray-200">
+            <!-- Mobile user info section -->
+            <div class="px-2 mb-3">
+              <div :class="['px-3 py-2 rounded-md text-sm font-semibold text-center', roleColor]">
+                <i class="fas fa-user mr-2"></i>
+                {{ displayUserInfo }}
+                <div v-if="userProfile.email" class="text-xs opacity-75 mt-1">
+                  {{ userProfile.email }}
+                </div>
+              </div>
+            </div>
+
             <div class="px-2 space-y-1">
               <button
                 @click="createNewRequest"

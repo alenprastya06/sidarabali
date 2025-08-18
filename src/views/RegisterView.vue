@@ -10,19 +10,9 @@
 
     <div class="relative max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 min-h-screen">
       <!-- Left brand/hero -->
-      <section
-        class="hidden lg:flex flex-col justify-between p-12 bg-gradient-to-br from-blue-600 to-indigo-600 text-white"
-      >
+      <section class="hidden lg:flex flex-col justify-between p-12 bg-blue-900 text-white">
         <div>
           <div class="flex items-center space-x-3">
-            <svg class="h-9 w-9 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"
-              />
-            </svg>
             <h1 class="text-2xl font-bold tracking-tight">Sidarabali</h1>
           </div>
           <h2 class="mt-10 text-4xl font-extrabold leading-tight">Buat akun baru.</h2>
@@ -58,19 +48,11 @@
           <div class="bg-white/90 backdrop-blur rounded-2xl shadow-xl border border-gray-100 p-8">
             <div class="mb-8">
               <div class="flex items-center space-x-3">
-                <svg
-                  class="h-8 w-8 text-blue-600"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0z"
-                  />
-                </svg>
+                <img
+                  class="w-10 h-10"
+                  src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/Coat_of_arms_of_Jakarta.svg/1814px-Coat_of_arms_of_Jakarta.svg.png"
+                  alt=""
+                />
                 <h2 class="text-2xl font-bold text-gray-900">Daftar akun</h2>
               </div>
               <p class="mt-2 text-sm text-gray-500">

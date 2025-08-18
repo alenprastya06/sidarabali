@@ -1,549 +1,472 @@
+<template>
+  <UserHeader />
+  <div class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-6">
+    <div class="max-w-7xl mx-auto">
+      <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">Data Pengajuan</h1>
+        <p class="text-gray-600">Kelola dan pantau status pengajuan rekomendasi hak atas tanah</p>
+      </div>
+
+      <div v-if="loading" class="flex justify-center items-center py-12">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+
+      <div v-else-if="error" class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+        <div class="flex">
+          <div class="flex-shrink-0">
+            <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+              <path
+                fill-rule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </div>
+          <div class="ml-3">
+            <h3 class="text-sm font-medium text-red-800">Error</h3>
+            <p class="mt-1 text-sm text-red-700">{{ error }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div
+        v-if="!loading && !error"
+        class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden"
+      >
+        <div class="px-6 py-4 border-b border-gray-200">
+          <h2 class="text-lg font-semibold text-gray-900">Daftar Pengajuan Pending</h2>
+        </div>
+
+        <!-- Table when data exists -->
+        <div v-if="filteredPengajuanData.length > 0" class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Kode Pengajuan
+                </th>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Pemohon
+                </th>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Lokasi
+                </th>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Status
+                </th>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Tanggal
+                </th>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Aksi
+                </th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              <tr
+                v-for="pengajuan in filteredPengajuanData"
+                :key="pengajuan.id_pengajuan"
+                class="hover:bg-gray-50 transition-colors duration-150"
+              >
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm font-medium text-gray-900">
+                    {{ pengajuan.kode_pengajuan }}
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <div class="flex-shrink-0 h-10 w-10">
+                      <div
+                        class="h-10 w-10 rounded-full bg-gradient-to-r from-blue-400 to-blue-600 flex items-center justify-center"
+                      >
+                        <span class="text-white font-medium text-sm">
+                          {{ getInitials(pengajuan.Owner.nama) }}
+                        </span>
+                      </div>
+                    </div>
+                    <div class="ml-4">
+                      <div class="text-sm font-medium text-gray-900">
+                        {{ pengajuan.Owner.nama }}
+                      </div>
+                      <div class="text-sm text-gray-500">
+                        {{ pengajuan.Owner.email }}
+                      </div>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-6 py-4">
+                  <div class="text-sm text-gray-900">
+                    {{ pengajuan.Lahan.wilayah_kelurahan }}, {{ pengajuan.Lahan.wilayah_kecamatan }}
+                  </div>
+                  <div class="text-sm text-gray-500">
+                    {{ pengajuan.Lahan.wilayah_kota }}
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span
+                    :class="getStatusBadgeClass(pengajuan.status)"
+                    class="inline-flex px-2 py-1 text-xs font-medium rounded-full"
+                  >
+                    {{ getStatusText(pengajuan.status) }}
+                  </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {{ formatDate(pengajuan.createdAt) }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                  <button
+                    @click="viewDetail(pengajuan.id_pengajuan)"
+                    class="text-blue-600 hover:text-blue-900 transition-colors duration-150 mr-3"
+                  >
+                    Detail
+                  </button>
+                  <button
+                    v-if="pengajuan.final_document_url"
+                    @click="downloadDocument(pengajuan.final_document_url)"
+                    class="text-green-600 hover:text-green-900 transition-colors duration-150"
+                  >
+                    Download
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Empty state when no pending data -->
+        <div v-else class="px-6 py-12 text-center">
+          <div
+            class="mx-auto h-16 w-16 rounded-full bg-gray-100 flex items-center justify-center mb-4"
+          >
+            <svg
+              class="h-8 w-8 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              />
+            </svg>
+          </div>
+          <h3 class="text-lg font-medium text-gray-900 mb-2">Tidak Ada Pengajuan Pending</h3>
+          <p class="text-gray-500 mb-6">
+            Saat ini tidak ada dokumen pengajuan yang sedang dalam proses.
+          </p>
+          <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 max-w-md mx-auto">
+            <div class="flex items-center">
+              <div class="flex-shrink-0">
+                <svg class="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path
+                    fill-rule="evenodd"
+                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
+              </div>
+              <div class="ml-3 text-left">
+                <h4 class="text-sm font-medium text-blue-800">Informasi</h4>
+                <p class="text-sm text-blue-700">
+                  Semua pengajuan telah diproses atau belum ada pengajuan baru yang masuk.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        v-if="showModal"
+        class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50"
+      >
+        <div
+          class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white"
+        >
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-medium text-gray-900">Detail Pengajuan</h3>
+            <button @click="closeModal" class="text-gray-400 hover:text-gray-600">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M6 18L18 6M6 6l12 12"
+                ></path>
+              </svg>
+            </button>
+          </div>
+
+          <div v-if="selectedPengajuan" class="space-y-4">
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700">Kode Pengajuan</label>
+                <p class="mt-1 text-sm text-gray-900">{{ selectedPengajuan.kode_pengajuan }}</p>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700">Status</label>
+                <span
+                  :class="getStatusBadgeClass(selectedPengajuan.status)"
+                  class="inline-flex px-2 py-1 text-xs font-medium rounded-full mt-1"
+                >
+                  {{ getStatusText(selectedPengajuan.status) }}
+                </span>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Nama Pemohon</label>
+              <p class="mt-1 text-sm text-gray-900">{{ selectedPengajuan.Owner.nama }}</p>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Alamat Lahan</label>
+              <p class="mt-1 text-sm text-gray-900">
+                {{ selectedPengajuan.Lahan.wilayah_kelurahan }},
+                {{ selectedPengajuan.Lahan.wilayah_kecamatan }},
+                {{ selectedPengajuan.Lahan.wilayah_kota }}
+              </p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700">Luas Lahan</label>
+                <p class="mt-1 text-sm text-gray-900">
+                  {{ selectedPengajuan.Lahan.luas_lahan }} m²
+                </p>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700">Jenis Bangunan</label>
+                <p class="mt-1 text-sm text-gray-900">
+                  {{ selectedPengajuan.Lahan.jenis_bangunan }}
+                </p>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Status Dokumen</label>
+              <div class="space-y-2 max-h-64 overflow-y-auto">
+                <div
+                  v-for="doc in selectedPengajuan.Documents"
+                  :key="doc.id"
+                  class="flex justify-between items-center p-2 bg-gray-50 rounded"
+                >
+                  <span class="text-sm text-gray-900 capitalize">{{
+                    doc.document_type.replace(/_/g, ' ')
+                  }}</span>
+                  <span
+                    :class="getDocumentStatusClass(doc.status)"
+                    class="inline-flex px-2 py-1 text-xs font-medium rounded-full"
+                  >
+                    {{ getDocumentStatusText(doc.status) }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted } from 'vue'
+import axios from 'axios'
+import Swal from 'sweetalert2'
 import UserHeader from './UserHeader.vue'
 
-const submissions = ref([])
+const pengajuanData = ref([])
+const filteredPengajuanData = ref([])
 const loading = ref(true)
 const error = ref(null)
+const showModal = ref(false)
+const selectedPengajuan = ref(null)
+const token = localStorage.getItem('token')
 
-// Pagination
-const currentPage = ref(1)
-const itemsPerPage = ref(10)
+const API_BASE = 'http://localhost:3000/api'
 
-// Filters
-const statusFilter = ref('pending')
-const searchQuery = ref('')
-const sortBy = ref('newest') // newest, oldest, name
+const axiosConfig = {
+  headers: {
+    Authorization: `Bearer ${token}`,
+    'Content-Type': 'application/json',
+  },
+}
 
-// View mode
-const viewMode = ref('table') // card, table, compact
-
-const fetchSubmissions = async () => {
-  const token = localStorage.getItem('token')
-
-  if (!token) {
-    error.value = 'Authentication token not found. Please log in again.'
-    loading.value = false
-    return
-  }
-
+const fetchPengajuan = async () => {
   try {
-    const response = await fetch('http://localhost:3001/api/documents/me/overview', {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-    })
+    loading.value = true
+    const response = await axios.get(`${API_BASE}/pengajuan`, axiosConfig)
 
-    if (!response.ok) {
-      if (response.status === 401) {
-        throw new Error('Unauthorized: Invalid or expired token. Please log in again.')
-      }
-      throw new Error(`Network response was not ok. Status: ${response.status}`)
+    if (Array.isArray(response.data) && response.data.length > 0 && response.data[0].pengajuan) {
+      pengajuanData.value = response.data[0].pengajuan
+      filteredPengajuanData.value = response.data[0].pengajuan.filter((p) => p.status === 'pending')
+    } else {
+      pengajuanData.value = []
+      filteredPengajuanData.value = []
     }
-    const data = await response.json()
-    submissions.value = data
+
+    Swal.fire({
+      icon: 'success',
+      title: 'Berhasil',
+      text: `Data pengajuan berhasil dimuat. Ditemukan ${filteredPengajuanData.value.length} pengajuan pending`,
+      timer: 2000,
+      showConfirmButton: false,
+      toast: true,
+      position: 'top-end',
+    })
   } catch (err) {
-    error.value = err.message || 'Failed to fetch data. Please try again later.'
-    console.error('Error fetching data:', err)
+    error.value = `Gagal memuat data: ${err.message}`
+    console.error('Error fetching pengajuan:', err)
+
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: `Gagal memuat data pengajuan: ${err.response?.data?.message || err.message}`,
+    })
   } finally {
     loading.value = false
   }
 }
 
-onMounted(fetchSubmissions)
-
-// Computed properties for filtering and sorting
-const filteredSubmissions = computed(() => {
-  let filtered = submissions.value
-
-  // Filter by status
-  if (statusFilter.value !== 'all') {
-    filtered = filtered.filter((submission) => submission.overall_status === statusFilter.value)
+const fetchDetailPengajuan = async (id) => {
+  try {
+    const response = await axios.get(`${API_BASE}/pengajuan/${id}`, axiosConfig)
+    return response.data
+  } catch (err) {
+    console.error('Error fetching detail:', err)
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: `Gagal memuat detail pengajuan: ${err.response?.data?.message || err.message}`,
+    })
+    return null
   }
+}
 
-  // Filter by search query
-  if (searchQuery.value) {
-    filtered = filtered.filter((submission) =>
-      submission.nama_pengajuan.toLowerCase().includes(searchQuery.value.toLowerCase()),
-    )
+const viewDetail = async (id) => {
+  const detail = await fetchDetailPengajuan(id)
+  if (detail) {
+    selectedPengajuan.value = detail
+    showModal.value = true
   }
+}
 
-  // Sort
-  filtered.sort((a, b) => {
-    switch (sortBy.value) {
-      case 'newest':
-        return new Date(b.created_at || 0) - new Date(a.created_at || 0)
-      case 'oldest':
-        return new Date(a.created_at || 0) - new Date(b.created_at || 0)
-      case 'name':
-        return a.nama_pengajuan.localeCompare(b.nama_pengajuan)
-      default:
-        return 0
+const closeModal = () => {
+  showModal.value = false
+  selectedPengajuan.value = null
+}
+
+const downloadDocument = async (url) => {
+  try {
+    const result = await Swal.fire({
+      title: 'Download Dokumen',
+      text: 'Apakah Anda yakin ingin mendownload dokumen ini?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Ya, Download',
+      cancelButtonText: 'Batal',
+    })
+
+    if (result.isConfirmed) {
+      window.open(url, '_blank')
+
+      Swal.fire({
+        icon: 'success',
+        title: 'Download Dimulai',
+        text: 'Dokumen sedang didownload',
+        timer: 2000,
+        showConfirmButton: false,
+        toast: true,
+        position: 'top-end',
+      })
     }
-  })
-
-  return filtered
-})
-
-// Computed properties for pagination
-const totalPages = computed(() => Math.ceil(filteredSubmissions.value.length / itemsPerPage.value))
-
-const paginatedSubmissions = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage.value
-  const end = start + itemsPerPage.value
-  return filteredSubmissions.value.slice(start, end)
-})
-
-const getStatusColor = (status) => {
-  switch (status) {
-    case 'approved':
-      return 'bg-green-100 text-green-800'
-    case 'pending':
-      return 'bg-yellow-100 text-yellow-800'
-    case 'rejected':
-      return 'bg-red-100 text-red-800'
-    default:
-      return 'bg-gray-100 text-gray-800'
+  } catch (err) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: 'Gagal mendownload dokumen',
+    })
   }
 }
 
-const getStatusBadgeColor = (status) => {
-  switch (status) {
-    case 'approved':
-      return 'bg-green-500'
-    case 'pending':
-      return 'bg-yellow-500'
-    case 'rejected':
-      return 'bg-red-500'
-    default:
-      return 'bg-gray-500'
+const getStatusCount = (status) => {
+  return pengajuanData.value.filter((p) => p.status === status).length
+}
+
+const getInitials = (name) => {
+  return name
+    .split(' ')
+    .map((n) => n[0])
+    .join('')
+    .substring(0, 2)
+    .toUpperCase()
+}
+
+const getStatusBadgeClass = (status) => {
+  const classes = {
+    completed: 'bg-green-100 text-green-800',
+    rejected: 'bg-red-100 text-red-800',
+    menunggu_perbaikan: 'bg-yellow-100 text-yellow-800',
+    pending: 'bg-blue-100 text-blue-800',
   }
+  return classes[status] || 'bg-gray-100 text-gray-800'
 }
 
-// Summary statistics
-const summaryStats = computed(() => {
-  const total = submissions.value.length
-  const approved = submissions.value.filter((s) => s.overall_status === 'approved').length
-  const pending = submissions.value.filter((s) => s.overall_status === 'pending').length
-  const rejected = submissions.value.filter((s) => s.overall_status === 'rejected').length
+const getStatusText = (status) => {
+  const texts = {
+    completed: 'Selesai',
+    rejected: 'Ditolak',
+    menunggu_perbaikan: 'Menunggu Perbaikan',
+    pending: 'Pending',
+  }
+  return texts[status] || status
+}
 
-  return { total, approved, pending, rejected }
+const getDocumentStatusClass = (status) => {
+  const classes = {
+    approved: 'bg-green-100 text-green-800',
+    rejected: 'bg-red-100 text-red-800',
+    pending: 'bg-yellow-100 text-yellow-800',
+  }
+  return classes[status] || 'bg-gray-100 text-gray-800'
+}
+
+const getDocumentStatusText = (status) => {
+  const texts = {
+    approved: 'Disetujui',
+    rejected: 'Ditolak',
+    pending: 'Menunggu',
+  }
+  return texts[status] || status
+}
+
+const formatDate = (dateString) => {
+  const options = {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  }
+  return new Date(dateString).toLocaleDateString('id-ID', options)
+}
+
+onMounted(() => {
+  fetchPengajuan()
 })
-
-const changePage = (page) => {
-  currentPage.value = page
-}
-
-const resetFilters = () => {
-  statusFilter.value = 'all'
-  searchQuery.value = ''
-  sortBy.value = 'newest'
-  currentPage.value = 1
-}
 </script>
-
-<template>
-  <UserHeader />
-  <div class="container mx-auto max-w-7xl p-8">
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-      <h1 class="text-3xl font-bold text-gray-800 mb-4 md:mb-0">Pengajuan Saya</h1>
-
-      <!-- Summary Stats -->
-      <div class="flex gap-4 text-sm">
-        <div class="bg-blue-50 px-3 py-1 rounded-full">
-          <span class="font-medium text-blue-800">Total: {{ summaryStats.total }}</span>
-        </div>
-        <div class="bg-green-50 px-3 py-1 rounded-full">
-          <span class="font-medium text-green-800">Approved: {{ summaryStats.approved }}</span>
-        </div>
-        <div class="bg-yellow-50 px-3 py-1 rounded-full">
-          <span class="font-medium text-yellow-800">Pending: {{ summaryStats.pending }}</span>
-        </div>
-        <div class="bg-red-50 px-3 py-1 rounded-full">
-          <span class="font-medium text-red-800">Rejected: {{ summaryStats.rejected }}</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Filters and Controls -->
-    <div class="bg-white rounded-lg shadow-sm border p-4 mb-6">
-      <div class="flex flex-col lg:flex-row gap-4 items-center">
-        <!-- Search -->
-        <div class="flex-1 min-w-0">
-          <input
-            v-model="searchQuery"
-            type="text"
-            placeholder="Search submissions..."
-            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
-        </div>
-
-        <!-- Status Filter -->
-        <select
-          v-model="statusFilter"
-          class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-        >
-          <option value="all">All Status</option>
-          <option value="approved">Approved</option>
-          <option value="pending">Pending</option>
-          <option value="rejected">Rejected</option>
-        </select>
-
-        <!-- Sort -->
-        <select
-          v-model="sortBy"
-          class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-        >
-          <option value="newest">Newest First</option>
-          <option value="oldest">Oldest First</option>
-          <option value="name">Name A-Z</option>
-        </select>
-
-        <!-- View Mode -->
-        <div class="flex border border-gray-300 rounded-lg overflow-hidden">
-          <button
-            @click="viewMode = 'card'"
-            :class="[
-              'px-3 py-2 text-sm',
-              viewMode === 'card'
-                ? 'bg-blue-500 text-white'
-                : 'bg-white text-gray-700 hover:bg-gray-50',
-            ]"
-          >
-            Card
-          </button>
-          <button
-            @click="viewMode = 'compact'"
-            :class="[
-              'px-3 py-2 text-sm border-l border-gray-300',
-              viewMode === 'compact'
-                ? 'bg-blue-500 text-white'
-                : 'bg-white text-gray-700 hover:bg-gray-50',
-            ]"
-          >
-            Compact
-          </button>
-          <button
-            @click="viewMode = 'table'"
-            :class="[
-              'px-3 py-2 text-sm border-l border-gray-300',
-              viewMode === 'table'
-                ? 'bg-blue-500 text-white'
-                : 'bg-white text-gray-700 hover:bg-gray-50',
-            ]"
-          >
-            Table
-          </button>
-        </div>
-
-        <!-- Items per page -->
-        <select
-          v-model="itemsPerPage"
-          class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-        >
-          <option value="5">5 per page</option>
-          <option value="10">10 per page</option>
-          <option value="20">20 per page</option>
-          <option value="50">50 per page</option>
-        </select>
-
-        <!-- Reset Filters -->
-        <button
-          @click="resetFilters"
-          class="px-4 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
-        >
-          Reset
-        </button>
-      </div>
-
-      <!-- Active Filters Display -->
-      <div
-        v-if="statusFilter !== 'all' || searchQuery"
-        class="flex flex-wrap gap-2 mt-3 pt-3 border-t"
-      >
-        <div
-          v-if="statusFilter !== 'all'"
-          class="flex items-center bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs"
-        >
-          Status: {{ statusFilter }}
-          <button @click="statusFilter = 'all'" class="ml-1 hover:text-blue-900">×</button>
-        </div>
-        <div
-          v-if="searchQuery"
-          class="flex items-center bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs"
-        >
-          Search: "{{ searchQuery }}"
-          <button @click="searchQuery = ''" class="ml-1 hover:text-blue-900">×</button>
-        </div>
-      </div>
-    </div>
-
-    <div v-if="loading" class="flex justify-center items-center h-64">
-      <div
-        class="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"
-      ></div>
-    </div>
-
-    <div
-      v-if="error"
-      class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4"
-      role="alert"
-    >
-      <p class="font-bold">Error</p>
-      <p>{{ error }}</p>
-    </div>
-
-    <div
-      v-if="filteredSubmissions.length === 0 && !loading && !error"
-      class="text-center text-gray-500 py-10"
-    >
-      <p class="text-xl">No submissions found matching your criteria.</p>
-      <button @click="resetFilters" class="mt-2 text-blue-600 hover:underline">
-        Clear all filters
-      </button>
-    </div>
-
-    <!-- Results Info -->
-    <div
-      v-if="filteredSubmissions.length > 0"
-      class="flex justify-between items-center mb-4 text-sm text-gray-600"
-    >
-      <span>
-        Showing {{ (currentPage - 1) * itemsPerPage + 1 }} -
-        {{ Math.min(currentPage * itemsPerPage, filteredSubmissions.length) }} of
-        {{ filteredSubmissions.length }} submissions
-      </span>
-    </div>
-
-    <!-- Card View -->
-    <div v-if="viewMode === 'card' && paginatedSubmissions.length" class="space-y-6">
-      <div
-        v-for="submission in paginatedSubmissions"
-        :key="submission.id_pengajuan"
-        class="bg-white rounded-lg shadow-sm border hover:shadow-md transition-shadow duration-200 overflow-hidden"
-      >
-        <div class="p-6">
-          <div class="flex justify-between items-start mb-4">
-            <h3 class="text-xl font-semibold text-gray-900 truncate pr-4">
-              {{ submission.nama_pengajuan }}
-            </h3>
-            <span
-              :class="[
-                'px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide flex-shrink-0',
-                getStatusColor(submission.overall_status),
-              ]"
-            >
-              {{ submission.overall_status }}
-            </span>
-          </div>
-
-          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mb-4">
-            <div>
-              <p class="text-gray-500">Status</p>
-              <p class="font-medium">{{ submission.status_pengajuan }}</p>
-            </div>
-            <div>
-              <p class="text-gray-500">Progress</p>
-              <p class="font-medium text-green-600">
-                {{ submission.approved_required_count }}/{{ submission.required_total }}
-              </p>
-            </div>
-            <div>
-              <p class="text-gray-500">Missing</p>
-              <p class="font-medium text-red-600">{{ submission.missing_required_count }}</p>
-            </div>
-            <div>
-              <p class="text-gray-500">Documents</p>
-              <p class="font-medium">{{ submission.documents?.length || 0 }}</p>
-            </div>
-          </div>
-
-          <div
-            v-if="submission.has_rejected"
-            class="flex items-center text-red-500 text-xs bg-red-50 p-2 rounded"
-          >
-            <span class="w-2 h-2 bg-red-500 rounded-full mr-2"></span>
-            Action required: Some documents rejected
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Compact View -->
-    <div
-      v-if="viewMode === 'compact' && paginatedSubmissions.length"
-      class="bg-white rounded-lg shadow-sm border overflow-hidden"
-    >
-      <div
-        v-for="submission in paginatedSubmissions"
-        :key="submission.id_pengajuan"
-        class="flex items-center justify-between p-4 border-b last:border-b-0 hover:bg-gray-50"
-      >
-        <div class="flex items-center space-x-4 flex-1 min-w-0">
-          <span
-            :class="[
-              'w-3 h-3 rounded-full flex-shrink-0',
-              getStatusBadgeColor(submission.overall_status),
-            ]"
-          ></span>
-          <div class="flex-1 min-w-0">
-            <p class="font-medium text-gray-900 truncate">{{ submission.nama_pengajuan }}</p>
-            <p class="text-sm text-gray-500">
-              {{ submission.approved_required_count }}/{{ submission.required_total }} approved
-              <span v-if="submission.missing_required_count > 0" class="text-red-600">
-                • {{ submission.missing_required_count }} missing
-              </span>
-            </p>
-          </div>
-        </div>
-        <span
-          :class="[
-            'px-2 py-1 rounded text-xs font-medium flex-shrink-0',
-            getStatusColor(submission.overall_status),
-          ]"
-        >
-          {{ submission.overall_status }}
-        </span>
-      </div>
-    </div>
-
-    <!-- Table View -->
-    <div
-      v-if="viewMode === 'table' && paginatedSubmissions.length"
-      class="bg-white rounded-lg shadow-sm border overflow-hidden"
-    >
-      <div class="overflow-x-auto">
-        <table class="w-full">
-          <thead class="bg-gray-50">
-            <tr>
-              <th
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                Name
-              </th>
-              <th
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                Status
-              </th>
-              <th
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                Progress
-              </th>
-              <th
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                Missing
-              </th>
-              <th
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                Issues
-              </th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-gray-200">
-            <tr
-              v-for="submission in paginatedSubmissions"
-              :key="submission.id_pengajuan"
-              class="hover:bg-gray-50"
-            >
-              <td class="px-6 py-4 whitespace-nowrap">
-                <div class="font-medium text-gray-900">{{ submission.nama_pengajuan }}</div>
-                <div class="text-sm text-gray-500">{{ submission.status_pengajuan }}</div>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <span
-                  :class="[
-                    'px-2 py-1 rounded-full text-xs font-medium',
-                    getStatusColor(submission.overall_status),
-                  ]"
-                >
-                  {{ submission.overall_status }}
-                </span>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-green-600 font-medium">
-                {{ submission.approved_required_count }}/{{ submission.required_total }}
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-red-600 font-medium">
-                {{ submission.missing_required_count }}
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <span
-                  v-if="submission.has_rejected"
-                  class="inline-flex items-center text-red-500 text-xs"
-                >
-                  <span class="w-2 h-2 bg-red-500 rounded-full mr-1"></span>
-                  Rejected docs
-                </span>
-                <span v-else class="text-gray-400 text-xs">-</span>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Pagination -->
-    <div v-if="totalPages > 1" class="flex justify-between items-center mt-6">
-      <div class="text-sm text-gray-700">Page {{ currentPage }} of {{ totalPages }}</div>
-      <div class="flex space-x-2">
-        <button
-          @click="changePage(currentPage - 1)"
-          :disabled="currentPage === 1"
-          :class="[
-            'px-3 py-2 text-sm rounded-lg border transition-colors',
-            currentPage === 1
-              ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-              : 'bg-white text-gray-700 hover:bg-gray-50 border-gray-300',
-          ]"
-        >
-          Previous
-        </button>
-
-        <div class="flex space-x-1">
-          <template v-for="page in Math.min(totalPages, 7)" :key="page">
-            <button
-              v-if="
-                page === 1 ||
-                page === totalPages ||
-                (page >= currentPage - 1 && page <= currentPage + 1)
-              "
-              @click="changePage(page)"
-              :class="[
-                'px-3 py-2 text-sm rounded-lg transition-colors',
-                page === currentPage
-                  ? 'bg-blue-500 text-white'
-                  : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300',
-              ]"
-            >
-              {{ page }}
-            </button>
-            <span
-              v-else-if="page === currentPage - 2 || page === currentPage + 2"
-              class="px-2 py-2 text-gray-500"
-            >
-              ...
-            </span>
-          </template>
-        </div>
-
-        <button
-          @click="changePage(currentPage + 1)"
-          :disabled="currentPage === totalPages"
-          :class="[
-            'px-3 py-2 text-sm rounded-lg border transition-colors',
-            currentPage === totalPages
-              ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-              : 'bg-white text-gray-700 hover:bg-gray-50 border-gray-300',
-          ]"
-        >
-          Next
-        </button>
-      </div>
-    </div>
-  </div>
-</template>

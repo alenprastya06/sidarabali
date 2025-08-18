@@ -6,6 +6,9 @@ import RegisterView from '../views/RegisterView.vue'
 import LoginView from '../views/LoginView.vue'
 import PengajuanProses from '@/views/PengajuanProses.vue'
 import ApproveDokumen from '@/views/ApproveDokumen.vue'
+import ButuhTindakan from '@/views/User/ButuhTindakan.vue'
+import PengajuanSelesai from '@/views/User/PengajuanSelesai.vue'
+import PengajuanDitolak from '@/views/User/PengajuanDitolak.vue'
 
 const UserDashboard = () => import('../views/UserDashboard.vue')
 const AdminDashboard = () => import('../views/AdminDashboard.vue')
@@ -139,6 +142,36 @@ const router = createRouter({
       path: '/user/pengajuan-proses',
       name: 'pengajuan-prses',
       component: PengajuanProses,
+      meta: {
+        requiresAuth: true,
+        roles: ['user'],
+        title: 'Profil - SIDARABALI',
+      },
+    },
+    {
+      path: '/user/izin-selesai',
+      name: 'izin-selesai',
+      component: PengajuanSelesai,
+      meta: {
+        requiresAuth: true,
+        roles: ['user'],
+        title: 'Profil - SIDARABALI',
+      },
+    },
+    {
+      path: '/user/izin-ditolak',
+      name: 'izin-ditolak',
+      component: PengajuanDitolak,
+      meta: {
+        requiresAuth: true,
+        roles: ['user'],
+        title: 'Profil - SIDARABALI',
+      },
+    },
+    {
+      path: '/user/izin-butuh-tindakan',
+      name: 'izin-butuh-tindakan',
+      component: ButuhTindakan,
       meta: {
         requiresAuth: true,
         roles: ['user'],

@@ -1,6 +1,5 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import Header from './UserHeader.vue'
 import UserHeader from './UserHeader.vue'
 import { useRouter, useRoute } from 'vue-router'
 
@@ -30,7 +29,7 @@ const menuItems = ref([
     featured: false,
   },
   {
-    id: 'izin-selesai',
+    id: '/user/izin-selesai',
     title: 'Izin Selesai',
     subtitle: 'Izin yang telah selesai diproses',
     icon: 'fas fa-check-circle',
@@ -38,7 +37,7 @@ const menuItems = ref([
     featured: false,
   },
   {
-    id: 'izin-butuh-tindakan',
+    id: '/user/izin-butuh-tindakan',
     title: 'Butuh Tindakan',
     subtitle: 'Izin yang memerlukan tindak lanjut',
     icon: 'fas fa-exclamation-circle',
@@ -46,7 +45,7 @@ const menuItems = ref([
     featured: false,
   },
   {
-    id: 'izin-ditolak',
+    id: '/user/izin-ditolak',
     title: 'Izin Ditolak',
     subtitle: 'Permohonan yang tidak dapat diproses',
     icon: 'fas fa-times-circle',
@@ -56,38 +55,7 @@ const menuItems = ref([
 ])
 
 const statisticItems = ref([
-  // {
-  //   id: 'total',
-  //   title: 'Total Permohonan',
-  //   value: '0',
-  //   key: 'total_pengajuan',
-  //   icon: 'fas fa-file-alt',
-  //   color: 'blue',
-  // },
-  // {
-  //   id: 'pending',
-  //   title: 'Sedang Diproses',
-  //   value: '0',
-  //   key: 'pending',
-  //   icon: 'fas fa-sync-alt',
-  //   color: 'yellow',
-  // },
-  // {
-  //   id: 'disetujui',
-  //   title: 'Sudah Disetujui',
-  //   value: '0',
-  //   key: 'disetujui',
-  //   icon: 'fas fa-check',
-  //   color: 'green',
-  // },
-  // {
-  //   id: 'ditolak',
-  //   title: 'Ditolak',
-  //   value: '0',
-  //   key: 'ditolak',
-  //   icon: 'fas fa-times',
-  //   color: 'red',
-  // },
+  // Statistics API removed - keeping empty for future use
 ])
 
 const getAuthToken = () => {
@@ -99,54 +67,13 @@ const getUserId = () => {
 }
 
 const fetchUserStats = async () => {
-  try {
-    loading.value = true
-    error.value = null
-
-    const token = getAuthToken()
-    const userId = getUserId()
-
-    if (!token) {
-      throw new Error('Token tidak ditemukan. Silakan login kembali.')
-    }
-
-    const response = await fetch(`http://localhost:3001/api/documents/user/${userId}/stats`, {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-    })
-
-    if (!response.ok) {
-      if (response.status === 401) {
-        throw new Error('Sesi telah berakhir. Silakan login kembali.')
-      } else if (response.status === 404) {
-        throw new Error('Data tidak ditemukan.')
-      } else {
-        throw new Error(`Error: ${response.status} - ${response.statusText}`)
-      }
-    }
-
-    const data = await response.json()
-    userStats.value = data
-
-    // Update statistik items dengan data dari API
-    statisticItems.value = statisticItems.value.map((item) => ({
-      ...item,
-      value: String(data[item.key] || '0'),
-    }))
-
-    console.log('User stats loaded:', data)
-  } catch (err) {
-    error.value = err.message
-    console.error('Error fetching user stats:', err)
-    if (err.message.includes('login')) {
-    }
-  } finally {
-    loading.value = false
-  }
+  // Statistics API removed - keeping function for future implementation
+  loading.value = false
+  error.value = null
+  userStats.value = null
+  console.log('Statistics API removed')
 }
+
 const refreshStats = () => {
   fetchUserStats()
 }
@@ -193,34 +120,66 @@ const colorVariants = {
 const handleTabChange = (tabId) => {
   activeTab.value = tabId
   console.log(`Tab aktif berubah ke: ${tabId}`)
-  navigationItems.value.forEach((item) => {
-    item.active = item.id === tabId
-  })
 }
 
 const handleCreateRequest = () => {
-  router.push('/user/permohonan-baru')
+  router.push('/user/halaman-permohonan')
 }
 
 const handleMenuClick = (menuId) => {
   console.log(`Menu diklik: ${menuId}`)
-  router.push(menuId)
+
+  // Validasi sebelum navigasi
+  if (!menuId || typeof menuId !== 'string') {
+    console.error('Invalid menu ID:', menuId)
+    return
+  }
+
+  try {
+    router.push(menuId)
+  } catch (err) {
+    console.error('Navigation error:', err)
+    error.value = 'Gagal melakukan navigasi. Silakan coba lagi.'
+  }
 }
 
 const getColorClass = (color, type) => {
   return colorVariants[color] ? colorVariants[color][type] : colorVariants.gray[type]
 }
 
-onMounted(() => {
+const handleRetry = () => {
+  error.value = null
   fetchUserStats()
+}
+
+// Navigation items untuk UserHeader jika diperlukan
+const navigationItems = ref([
+  { id: 'dashboard', label: 'Dashboard', icon: 'fas fa-home', active: true },
+  { id: 'berkas-saya', label: 'Berkas Saya', icon: 'fas fa-folder', active: false },
+  { id: 'akun-saya', label: 'Akun Saya', icon: 'fas fa-user', active: false },
+])
+
+onMounted(() => {
+  // Set active tab berdasarkan route
+  const currentPath = route.path
+  if (currentPath === '/user/dashboard') {
+    activeTab.value = 'dashboard'
+  }
+
+  // fetchUserStats() removed since stats API is no longer used
 })
 </script>
 
 <template>
-  <div class="bg-gray-50">
-    <UserHeader />
+  <div class="bg-gray-50 min-h-screen">
+    <UserHeader
+      :navigationItems="navigationItems"
+      @tab-change="handleTabChange"
+      @create-request="handleCreateRequest"
+    />
 
     <main class="max-w-7xl mx-auto p-6">
+      <!-- Header Section -->
       <div class="mb-8">
         <div class="flex items-center justify-between">
           <div>
@@ -229,20 +188,41 @@ onMounted(() => {
             </h1>
             <p class="text-gray-600">Kelola semua permohonan izin Anda dengan mudah dan efisien</p>
           </div>
+
+          <!-- Refresh Button - Hidden since no stats API -->
+          <button
+            v-if="false"
+            @click="refreshStats"
+            :disabled="loading"
+            class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+          >
+            <i :class="['fas fa-sync-alt', { 'fa-spin': loading }]"></i>
+            <span>{{ loading ? 'Memuat...' : 'Refresh' }}</span>
+          </button>
         </div>
 
+        <!-- Error Alert -->
         <div v-if="error" class="mt-4 bg-red-50 border border-red-200 rounded-lg p-4">
-          <div class="flex items-center">
-            <i class="fas fa-exclamation-triangle text-red-500 mr-2"></i>
-            <span class="text-red-700">{{ error }}</span>
+          <div class="flex items-center justify-between">
+            <div class="flex items-center">
+              <i class="fas fa-exclamation-triangle text-red-500 mr-2"></i>
+              <span class="text-red-700">{{ error }}</span>
+            </div>
+            <button
+              @click="handleRetry"
+              class="text-red-600 hover:text-red-800 text-sm font-medium"
+            >
+              Coba Lagi
+            </button>
           </div>
         </div>
       </div>
 
+      <!-- Featured Menu Items (if any) -->
       <div
         v-for="item in menuItems.filter((item) => item.featured)"
         :key="item.id"
-        class="mb-8 bg-gradient-to-r from-blue-600 to-blue-700 rounded-xl p-8 text-white shadow-lg cursor-pointer transform hover:scale-[1.02] transition-all duration-300"
+        class="mb-8 bg-gradient-to-r from-blue-600 to-blue-700 rounded-xl p-8 text-white shadow-lg cursor-pointer transform hover:scale-[1.02] transition-all duration-300 featured-card"
         @click="handleMenuClick(item.id)"
       >
         <div class="flex items-center justify-between">
@@ -263,6 +243,7 @@ onMounted(() => {
         </div>
       </div>
 
+      <!-- Menu Grid -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
         <div
           v-for="item in menuItems.filter((item) => !item.featured)"
@@ -284,12 +265,14 @@ onMounted(() => {
         </div>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <!-- Statistics Grid - Hidden since no stats API -->
+      <div v-if="false" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <div
           v-for="stat in statisticItems"
           :key="stat.id"
           class="bg-white rounded-xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-shadow duration-300 relative overflow-hidden"
         >
+          <!-- Loading Overlay -->
           <div
             v-if="loading"
             class="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center"
@@ -312,6 +295,19 @@ onMounted(() => {
             </div>
           </div>
         </div>
+      </div>
+
+      <!-- Empty State jika tidak ada statistik -->
+      <div v-if="false && !loading && !error && userStats === null" class="text-center py-12">
+        <i class="fas fa-chart-bar text-gray-400 text-4xl mb-4"></i>
+        <h3 class="text-lg font-semibold text-gray-600 mb-2">Belum Ada Data Statistik</h3>
+        <p class="text-gray-500">Mulai buat permohonan untuk melihat statistik Anda</p>
+        <button
+          @click="handleMenuClick('/user/halaman-permohonan')"
+          class="mt-4 px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors duration-200"
+        >
+          Buat Permohonan Pertama
+        </button>
       </div>
     </main>
   </div>
@@ -360,5 +356,19 @@ onMounted(() => {
 
 .featured-card {
   animation: pulse-subtle 3s ease-in-out infinite;
+}
+
+/* Loading animation */
+.fa-spin {
+  animation: fa-spin 1s infinite linear;
+}
+
+@keyframes fa-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(359deg);
+  }
 }
 </style>
