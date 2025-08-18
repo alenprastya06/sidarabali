@@ -1,9 +1,13 @@
 <template>
   <UserHeader />
-  <div class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-6">
+  <div class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 px-6">
     <div class="max-w-7xl mx-auto">
+      <button @click="goBack" class="flex items-center gap-2 py-2 rounded mb-5">
+        <i class="fa-solid fa-arrow-left"></i>
+        Kembali
+      </button>
       <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">Data Pengajuan</h1>
+        <h1 class="text-xl font-bold text-gray-900 mb-2">Data Pengajuan</h1>
         <p class="text-gray-600">Kelola dan pantau status pengajuan rekomendasi hak atas tanah</p>
       </div>
 
@@ -289,6 +293,14 @@ import { ref, onMounted } from 'vue'
 import axios from 'axios'
 import Swal from 'sweetalert2'
 import UserHeader from './UserHeader.vue'
+
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+
+const goBack = () => {
+  router.back()
+}
 
 const pengajuanData = ref([])
 const filteredPengajuanData = ref([])

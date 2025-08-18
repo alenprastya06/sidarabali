@@ -1,9 +1,13 @@
 <template>
   <UserHeader />
   <div class="min-h-screen bg-gray-50">
-    <div class="max-w-7xl mx-auto px-6 py-8">
+    <div class="max-w-7xl mx-auto px-6">
+      <button @click="goBack" class="flex items-center gap-2 py-2 rounded mb-5">
+        <i class="fa-solid fa-arrow-left"></i>
+        Kembali
+      </button>
       <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-800 mb-2">Persyaratan Izin</h1>
+        <h1 class="text-xl font-bold text-gray-800 mb-2">Persyaratan Izin</h1>
         <p class="text-gray-600">Lengkapi semua langkah berikut untuk mengajukan izin</p>
       </div>
 
@@ -743,7 +747,13 @@ const lahanData = ref(null)
 // Step management
 const currentStep = ref(1)
 const maxStep = 4
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
+
+const goBack = () => {
+  router.back() // sama dengan history.back()
+}
 const steps = [
   { title: 'Pilih Pengajuan', description: 'Pilih jenis izin yang akan diajukan' },
   { title: 'Data Pemilik & Lahan', description: 'Lengkapi informasi pemilik dan lahan' },

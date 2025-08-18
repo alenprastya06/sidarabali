@@ -2,7 +2,10 @@
   <UserHeader />
   <div class="max-w-7xl mx-auto px-4 py-6">
     <div class="bg-white rounded-lg shadow-lg">
-      <!-- Header -->
+      <button @click="goBack" class="flex items-center gap-2 py-2 rounded mb-5">
+        <i class="fa-solid fa-arrow-left"></i>
+        Kembali
+      </button>
       <div class="px-6 py-4 border-b border-gray-200">
         <h2 class="text-2xl font-bold text-gray-800">Daftar Pengajuan Perlu Revisi</h2>
         <p class="text-gray-600 mt-1">Kelola pengajuan yang memerlukan perbaikan</p>
@@ -347,8 +350,12 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import UserHeader from '../UserHeader.vue'
+import { useRouter } from 'vue-router'
+const router = useRouter()
+const goBack = () => {
+  router.back()
+}
 
-// Reactive data
 const pengajuanList = ref([])
 const loading = ref(true)
 const error = ref(null)

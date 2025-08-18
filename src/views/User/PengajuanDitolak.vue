@@ -1,9 +1,13 @@
 <template>
   <UserHeader />
-  <div class="min-h-screen bg-gradient-to-br from-slate-50 to-red-50 p-6">
+  <div class="min-h-screen bg-gradient-to-br from-slate-50 to-red-50 px-6">
     <div class="max-w-7xl mx-auto">
+      <button @click="goBack" class="flex items-center gap-2 py-2 rounded mb-5">
+        <i class="fa-solid fa-arrow-left"></i>
+        Kembali
+      </button>
       <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">Data Pengajuan Ditolak</h1>
+        <h1 class="text-xl font-bold text-gray-900 mb-2">Data Pengajuan Ditolak</h1>
         <p class="text-gray-600">Daftar pengajuan rekomendasi hak atas tanah yang telah ditolak</p>
       </div>
 
@@ -435,6 +439,13 @@ const error = ref(null)
 const showModal = ref(false)
 const selectedPengajuan = ref(null)
 const token = localStorage.getItem('token')
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+
+const goBack = () => {
+  router.back()
+}
 
 const API_BASE = 'http://localhost:3000/api'
 
