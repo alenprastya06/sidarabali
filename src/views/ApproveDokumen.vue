@@ -329,7 +329,7 @@ const fetchData = async () => {
     loading.value = true
     error.value = null
 
-    const response = await axios.get('http://localhost:3000/api/pengajuan', {
+    const response = await axios.get('https://bitwisi.cloud/api/pengajuan', {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -408,7 +408,7 @@ const generateDocument = async (pengajuan) => {
     console.log('Generating document for pengajuan ID:', pengajuanId)
 
     const response = await axios.post(
-      `http://localhost:3000/api/pengajuan/${pengajuanId}/generate-document`,
+      `https://bitwisi.cloud/api/pengajuan/${pengajuanId}/generate-document`,
       {},
       {
         headers: {

@@ -464,7 +464,7 @@ const sortBy = ref('updatedAt')
 const sortOrder = ref('desc')
 const token = localStorage.getItem('token')
 
-const API_BASE = 'http://localhost:3000/api'
+const API_BASE = 'https://bitwisi.cloud/api'
 
 const axiosConfig = {
   headers: {

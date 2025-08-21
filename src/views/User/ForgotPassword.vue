@@ -250,7 +250,7 @@ const submitForgotPassword = async () => {
 
   try {
     // Call API to request password reset
-    const response = await axios.post('http://localhost:3000/api/auth/forgot-password', {
+    const response = await axios.post('https://bitwisi.cloud/api/auth/forgot-password', {
       email: email.value,
     })
 

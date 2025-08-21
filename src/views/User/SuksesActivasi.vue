@@ -81,7 +81,7 @@ const route = useRoute()
 const activateAccount = async (token) => {
   try {
     // Make sure to use your actual backend URL
-    const response = await axios.get(`http://localhost:3000/api/auth/activate/${token}`)
+    const response = await axios.get(`https://bitwisi.cloud/api/auth/activate/${token}`)
 
     // Update state on success
     status.value = 'success'

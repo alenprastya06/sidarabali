@@ -233,7 +233,7 @@
 import { ref, onMounted, computed } from 'vue'
 
 // Base URL for the API
-const BASE_URL = 'http://localhost:3000/api'
+const BASE_URL = 'https://bitwisi.cloud/api'
 
 const users = ref([])
 const isLoading = ref(true)

@@ -378,7 +378,7 @@ const fetchPengajuanData = async () => {
       throw new Error('Token tidak ditemukan. Silakan login terlebih dahulu.')
     }
 
-    const response = await fetch('http://localhost:3000/api/pengajuan/needs-revision', {
+    const response = await fetch('https://bitwisi.cloud/api/pengajuan/needs-revision', {
       headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
@@ -517,7 +517,7 @@ const submitRevision = async () => {
     }
 
     const response = await fetch(
-      `http://localhost:3000/api/pengajuan/${selectedPengajuan.value.id}`,
+      `https://bitwisi.cloud/api/pengajuan/${selectedPengajuan.value.id}`,
       {
         method: 'PUT',
         headers: {

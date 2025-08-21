@@ -193,7 +193,7 @@
 import { ref, onMounted } from 'vue'
 
 // Base URL for the API
-const BASE_URL = 'http://localhost:3000/api'
+const BASE_URL = 'https://bitwisi.cloud/api'
 
 // Reactive state for data, loading, and errors
 const drafts = ref([])

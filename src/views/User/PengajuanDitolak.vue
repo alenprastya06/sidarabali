@@ -447,7 +447,7 @@ const goBack = () => {
   router.back()
 }
 
-const API_BASE = 'http://localhost:3000/api'
+const API_BASE = 'https://bitwisi.cloud/api'
 
 const axiosConfig = {
   headers: {

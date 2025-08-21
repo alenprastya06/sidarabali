@@ -1009,7 +1009,7 @@ const handleLahanUpdate = (data) => {
 // API methods
 const fetchPengajuan = async () => {
   try {
-    const pengajuanResponse = await axios.get('http://localhost:3000/api/jenis-pengajuan', {
+    const pengajuanResponse = await axios.get('https://bitwisi.cloud/api/jenis-pengajuan', {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -1365,7 +1365,7 @@ const submitDocuments = async () => {
     const timeoutId = setTimeout(() => controller.abort(), 30000)
 
     try {
-      const response = await axios.post('http://localhost:3000/api/pengajuan', payload, {
+      const response = await axios.post('https://bitwisi.cloud/api/pengajuan', payload, {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,

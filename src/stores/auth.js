@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import axios from 'axios'
 import router from '../router'
 
-const API_URL = 'http://localhost:3000/api/auth'
+const API_URL = 'https://bitwisi.cloud/api/auth'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({

@@ -369,7 +369,7 @@ const fetchData = async () => {
     loading.value = true
     error.value = null
 
-    const response = await axios.get('http://localhost:3000/api/pengajuan', {
+    const response = await axios.get('https://bitwisi.cloud/api/pengajuan', {
       headers: {
         Authorization: `Bearer ${token}`,
       },

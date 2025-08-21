@@ -569,7 +569,7 @@ const submitResetPassword = async () => {
   try {
     // Call API to reset password
     const response = await axios.post(
-      `http://localhost:3000/api/auth/reset-password/${token.value}`,
+      `https://bitwisi.cloud/api/auth/reset-password/${token.value}`,
       {
         password: formData.value.password,
         confirmPassword: formData.value.confirmPassword,

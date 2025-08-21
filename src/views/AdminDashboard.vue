@@ -925,7 +925,7 @@ const viewDetails = async (pengajuanId) => {
       throw new Error('Token tidak ditemukan. Silakan login kembali.')
     }
 
-    const response = await fetch(`http://localhost:3000/api/pengajuan/${pengajuanId}`, {
+    const response = await fetch(`https://bitwisi.cloud/api/pengajuan/${pengajuanId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
@@ -976,7 +976,7 @@ const fetchData = async () => {
       throw new Error('Token tidak ditemukan. Silakan login kembali.')
     }
 
-    const response = await fetch('http://localhost:3000/api/dashboard', {
+    const response = await fetch('https://bitwisi.cloud/api/dashboard', {
       headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
