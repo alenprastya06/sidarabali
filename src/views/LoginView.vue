@@ -171,7 +171,13 @@
                   <input type="checkbox" class="h-4 w-4 text-blue-600 border-gray-300 rounded" />
                   <span>Ingat saya</span>
                 </label>
-                <a href="#" class="text-sm text-blue-600 hover:text-blue-700">Lupa kata sandi?</a>
+
+                <router-link
+                  class="text-sm text-blue-600 hover:text-blue-700 cursor-pointer"
+                  to="/forgot-password"
+                >
+                  Lupa kata sandi?
+                </router-link>
               </div>
 
               <div v-if="authStore.error" class="text-red-600 text-sm text-center">
@@ -212,9 +218,13 @@
 
             <p class="text-center text-gray-600 text-sm mt-6">
               Belum punya akun?
-              <router-link to="/register" class="text-blue-600 hover:text-blue-800 font-medium"
-                >Daftar</router-link
+              <a
+                href="#"
+                @click.prevent="goToRegister"
+                class="text-blue-600 hover:text-blue-800 font-medium cursor-pointer"
               >
+                Daftar
+              </a>
             </p>
           </div>
         </div>
@@ -225,16 +235,33 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 
+const router = useRouter()
 const authStore = useAuthStore()
 const email = ref('')
 const password = ref('')
 const showPassword = ref(false)
+
 const handleLogin = async () => {
   await authStore.login({
     email: email.value,
     password: password.value,
+  })
+}
+
+const goToForgotPassword = () => {
+  console.log('Navigating to forgot-password')
+  router.push('/forgot-password').catch((err) => {
+    console.error('Navigation error:', err)
+  })
+}
+
+const goToRegister = () => {
+  console.log('Navigating to register')
+  router.push('/register').catch((err) => {
+    console.error('Navigation error:', err)
   })
 }
 </script>

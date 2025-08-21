@@ -8,11 +8,6 @@ const route = useRoute()
 const props = defineProps({
   navigationItems: {
     type: Array,
-    default: () => [
-      { id: 'dashboard', label: 'Dashboard', icon: 'fas fa-home', active: true },
-      { id: 'berkas-saya', label: 'Berkas Saya', icon: 'fas fa-folder', active: false },
-      { id: 'akun-saya', label: 'Akun Saya', icon: 'fas fa-user', active: false },
-    ],
   },
 })
 
@@ -261,13 +256,7 @@ const roleColor = computed(() => {
                 <i class="fas fa-plus mr-3 w-5"></i>
                 Buat Permohonan Baru
               </button>
-              <button
-                @click="goToPemilikDokumen"
-                class="flex items-center w-full bg-blue-500 hover:bg-blue-600 text-white px-3 py-3 rounded-md text-base font-semibold transition-colors duration-200 shadow"
-              >
-                <i class="fas fa-file-alt mr-3 w-5"></i>
-                Buat Pengajuan
-              </button>
+
               <button
                 @click="handleLogout"
                 class="flex items-center w-full bg-red-500 hover:bg-red-600 text-white px-3 py-3 rounded-md text-base font-semibold transition-colors duration-200 shadow"

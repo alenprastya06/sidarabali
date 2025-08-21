@@ -80,7 +80,19 @@
           <span
             class="ml-4 font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100 whitespace-nowrap"
           >
-            Download Surat
+            Generate Surat Ke User
+          </span>
+        </router-link>
+        <router-link
+          to="/admin/list-surat"
+          class="group-nav flex items-center py-3 px-3 text-gray-400 hover:text-white hover:bg-gray-800 transition-all duration-300 rounded-xl relative"
+          active-class="text-white bg-red-600 hover:bg-red-700"
+        >
+          <FileText :size="20" class="flex-shrink-0" />
+          <span
+            class="ml-4 font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100 whitespace-nowrap"
+          >
+            List Semua Surat
           </span>
         </router-link>
       </nav>

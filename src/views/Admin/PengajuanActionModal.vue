@@ -201,16 +201,24 @@
                   }}
                   <span v-if="selectedAction === 'rejected'" class="text-red-500">*</span>
                 </label>
-                <textarea
-                  v-model="adminNote"
-                  rows="3"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-sm"
-                  :placeholder="
-                    selectedAction === 'approved'
-                      ? 'Tambahkan catatan...'
-                      : 'Jelaskan alasan penolakan...'
-                  "
-                ></textarea>
+                <div class="relative">
+                  <textarea
+                    v-model="adminNote"
+                    rows="3"
+                    class="w-full px-3 py-2 pr-8 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-sm resize-both min-h-[75px] max-h-[300px]"
+                    :placeholder="
+                      selectedAction === 'approved'
+                        ? 'Tambahkan catatan...'
+                        : 'Jelaskan alasan penolakan...'
+                    "
+                    style="resize: vertical"
+                  ></textarea>
+                  <div class="absolute bottom-2 right-2 text-gray-400 pointer-events-none">
+                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M13 6l3 3-3 3M4 6l3 3-3 3" />
+                    </svg>
+                  </div>
+                </div>
                 <p v-if="noteError" class="mt-1 text-xs text-red-500">{{ noteError }}</p>
               </div>
 
@@ -266,12 +274,20 @@
                 <label class="block text-sm font-medium text-gray-700 mb-1">
                   Alasan Penolakan <span class="text-red-500">*</span>
                 </label>
-                <textarea
-                  v-model="rejectReason"
-                  rows="3"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 text-sm"
-                  placeholder="Jelaskan alasan penolakan pengajuan..."
-                ></textarea>
+                <div class="relative">
+                  <textarea
+                    v-model="rejectReason"
+                    rows="3"
+                    class="w-full px-3 py-2 pr-8 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 text-sm resize-both min-h-[75px] max-h-[300px]"
+                    placeholder="Jelaskan alasan penolakan pengajuan..."
+                    style="resize: vertical"
+                  ></textarea>
+                  <div class="absolute bottom-2 right-2 text-gray-400 pointer-events-none">
+                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M13 6l3 3-3 3M4 6l3 3-3 3" />
+                    </svg>
+                  </div>
+                </div>
                 <p v-if="rejectReasonError" class="mt-1 text-xs text-red-500">
                   {{ rejectReasonError }}
                 </p>
@@ -605,8 +621,7 @@ const confirmDocumentAction = async () => {
   }
 
   // Jika aksi adalah "tolak", periksa catatan admin
-  const finalStatus =
-    selectedAction.value === 'rejected' ? 'menunggu_perbaikan' : selectedAction.value
+  const finalStatus = selectedAction.value === 'rejected' ? 'rejected' : selectedAction.value
 
   if (finalStatus === 'menunggu_perbaikan' && !adminNote.value.trim()) {
     noteError.value = 'Alasan penolakan wajib diisi'
@@ -701,5 +716,33 @@ const confirmDocumentAction = async () => {
   to {
     transform: rotate(360deg);
   }
+}
+
+/* Styles untuk textarea yang dapat diresize */
+textarea.resize-both {
+  resize: vertical;
+  overflow: auto;
+}
+
+/* Hover effect untuk resize handle */
+textarea:hover {
+  border-color: #6366f1;
+}
+
+/* Focus state yang lebih smooth */
+textarea:focus {
+  transition:
+    border-color 0.15s ease-in-out,
+    box-shadow 0.15s ease-in-out;
+}
+
+/* Custom resize handle styling */
+textarea::-webkit-resizer {
+  background: linear-gradient(-45deg, transparent 40%, #cbd5e1 40%, #cbd5e1 60%, transparent 60%);
+  border-radius: 0 0 3px 0;
+}
+
+textarea:hover::-webkit-resizer {
+  background: linear-gradient(-45deg, transparent 40%, #6366f1 40%, #6366f1 60%, transparent 60%);
 }
 </style>

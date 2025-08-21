@@ -10,6 +10,9 @@ import ButuhTindakan from '@/views/User/ButuhTindakan.vue'
 import PengajuanSelesai from '@/views/User/PengajuanSelesai.vue'
 import PengajuanDitolak from '@/views/User/PengajuanDitolak.vue'
 import SuksesActivasi from '@/views/User/SuksesActivasi.vue'
+import ResetPassword from '@/views/User/ResetPassword.vue'
+import ForgotPassword from '@/views/User/ForgotPassword.vue'
+import ListSemuaSurat from '@/views/Admin/ListSemuaSurat.vue'
 
 const UserDashboard = () => import('../views/UserDashboard.vue')
 const AdminDashboard = () => import('../views/AdminDashboard.vue')
@@ -25,21 +28,78 @@ const BerkasSaya = () => import('@/views/BerkasSaya.vue')
 const AkunSaya = () => import('@/views/AkunSaya.vue')
 const PemilikDokumen = () => import('@/views/PemilikDokumen.vue')
 
+// Helper function to validate token
+const validateToken = async (token) => {
+  if (!token) return false
+
+  try {
+    // Check if token is expired (assuming JWT structure)
+    const payload = JSON.parse(atob(token.split('.')[1]))
+    const isExpired = payload.exp * 1000 < Date.now()
+
+    if (isExpired) {
+      return false
+    }
+
+    // Optional: Make API call to verify token with backend
+    // const response = await fetch('/api/verify-token', {
+    //   headers: { 'Authorization': `Bearer ${token}` }
+    // })
+    // return response.ok
+
+    return true
+  } catch (error) {
+    console.error('Token validation error:', error)
+    return false
+  }
+}
+
+// Helper function to remove token and clear auth state
+const clearAuthAndRedirect = () => {
+  // Remove token from localStorage/sessionStorage
+  localStorage.removeItem('auth_token')
+  localStorage.removeItem('access_token')
+  sessionStorage.removeItem('auth_token')
+  sessionStorage.removeItem('access_token')
+
+  // Clear any auth-related cookies
+  document.cookie.split(';').forEach((c) => {
+    document.cookie = c
+      .replace(/^ +/, '')
+      .replace(/=.*/, '=;expires=' + new Date().toUTCString() + ';path=/')
+  })
+
+  // Clear auth store
+  const authStore = useAuthStore()
+  authStore.logout()
+
+  return '/'
+}
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-    // Rute aktivasi email dengan parameter token (wajib)
     {
       path: '/aktivasi-email/:token',
       name: 'activasi-email',
       component: SuksesActivasi,
       meta: {
         title: 'Aktivasi Email - SIDARABALI',
-        isPublic: true, // Tidak perlu autentikasi
+        isPublic: true,
       },
-      props: true, // Kirim token sebagai props
+      props: true,
     },
-    // Alternatif dengan query parameter
+    {
+      path: '/reset-password/:token',
+      name: 'reset-password',
+      component: ResetPassword,
+      meta: {
+        title: 'Reset Password - SIDARABALI',
+        isPublic: true,
+      },
+      props: true,
+    },
+
     {
       path: '/activate',
       name: 'activate-email',
@@ -68,7 +128,19 @@ const router = createRouter({
       meta: {
         title: 'Daftar - SIDARABALI',
         requiresGuest: true,
+        isPublic: true,
       },
+    },
+    {
+      path: '/forgot-password',
+      name: 'forgot',
+      component: ForgotPassword,
+      meta: {
+        title: 'Forgot Password - SIDARABALI',
+        isPublic: true,
+        requiresGuest: true,
+      },
+      props: true,
     },
     {
       path: '/login',
@@ -77,6 +149,7 @@ const router = createRouter({
       meta: {
         title: 'Masuk - SIDARABALI',
         requiresGuest: true,
+        isPublic: true,
       },
     },
     {
@@ -245,6 +318,15 @@ const router = createRouter({
           },
         },
         {
+          path: 'list-surat',
+          name: 'list-surat',
+          component: ListSemuaSurat,
+          meta: {
+            title: 'Manajemen Surat - SIDARABALI',
+            keepAlive: true,
+          },
+        },
+        {
           path: 'dokument',
           name: 'admin-dokument',
           component: DocumentApprovalPreview,
@@ -304,14 +386,55 @@ router.beforeEach(async (to, from, next) => {
     }
 
     // Handle public routes (like activation) - allow access without authentication
-    if (to.meta.isPublic || to.name === 'activasi-email' || to.name === 'activate-email') {
+    if (
+      to.meta.isPublic ||
+      to.name === 'activasi-email' ||
+      to.name === 'activate-email' ||
+      to.name === 'forgot-password'
+    ) {
       console.log('Public route detected, allowing access')
       next()
       return
     }
 
+    // Get token from various sources
+    const token =
+      authStore.token ||
+      localStorage.getItem('auth_token') ||
+      localStorage.getItem('access_token') ||
+      sessionStorage.getItem('auth_token') ||
+      sessionStorage.getItem('access_token')
+
+    // Validate token if it exists
+    if (token) {
+      const isValidToken = await validateToken(token)
+
+      if (!isValidToken) {
+        console.log('Invalid or expired token detected, clearing auth and redirecting to home')
+        const redirectPath = clearAuthAndRedirect()
+        next(redirectPath)
+        return
+      }
+    }
+
+    // If no token and route requires authentication
+    if (!token && to.meta.requiresAuth) {
+      console.log('No valid token found for protected route, redirecting to home')
+      const redirectPath = clearAuthAndRedirect()
+      next(redirectPath)
+      return
+    }
+
     // Redirect authenticated users away from guest-only pages
-    if (to.meta.requiresGuest && authStore.isAuthenticated) {
+    if (to.meta.requiresGuest && authStore.isAuthenticated && token) {
+      const isValidToken = await validateToken(token)
+
+      if (!isValidToken) {
+        // If token is invalid, allow access to guest pages
+        next()
+        return
+      }
+
       const userRole = authStore.user?.role
       const redirectPath = userRole === 'admin' ? '/admin/dashboard' : '/user/dashboard'
       next(redirectPath)
@@ -320,9 +443,19 @@ router.beforeEach(async (to, from, next) => {
 
     // Check authentication for protected routes
     if (to.meta.requiresAuth) {
-      if (!authStore.isAuthenticated) {
-        sessionStorage.setItem('redirectPath', to.fullPath)
-        next('/login')
+      if (!authStore.isAuthenticated || !token) {
+        console.log('Authentication required but user not authenticated, redirecting to home')
+        const redirectPath = clearAuthAndRedirect()
+        next(redirectPath)
+        return
+      }
+
+      // Double-check token validity for protected routes
+      const isValidToken = await validateToken(token)
+      if (!isValidToken) {
+        console.log('Token validation failed for protected route, redirecting to home')
+        const redirectPath = clearAuthAndRedirect()
+        next(redirectPath)
         return
       }
 
@@ -336,7 +469,15 @@ router.beforeEach(async (to, from, next) => {
     }
 
     // Handle login redirect for authenticated users
-    if (to.path === '/login' && authStore.isAuthenticated) {
+    if (to.path === '/login' && authStore.isAuthenticated && token) {
+      const isValidToken = await validateToken(token)
+
+      if (!isValidToken) {
+        const redirectPath = clearAuthAndRedirect()
+        next(redirectPath)
+        return
+      }
+
       const redirectPath = sessionStorage.getItem('redirectPath')
       if (redirectPath) {
         sessionStorage.removeItem('redirectPath')
@@ -354,7 +495,9 @@ router.beforeEach(async (to, from, next) => {
     next()
   } catch (error) {
     console.error('Navigation guard error:', error)
-    next('/')
+    // On any error, clear auth and redirect to home
+    const redirectPath = clearAuthAndRedirect()
+    next(redirectPath)
   }
 })
 

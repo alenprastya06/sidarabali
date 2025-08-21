@@ -152,13 +152,6 @@ const handleRetry = () => {
   fetchUserStats()
 }
 
-// Navigation items untuk UserHeader jika diperlukan
-const navigationItems = ref([
-  { id: 'dashboard', label: 'Dashboard', icon: 'fas fa-home', active: true },
-  { id: 'berkas-saya', label: 'Berkas Saya', icon: 'fas fa-folder', active: false },
-  { id: 'akun-saya', label: 'Akun Saya', icon: 'fas fa-user', active: false },
-])
-
 onMounted(() => {
   // Set active tab berdasarkan route
   const currentPath = route.path

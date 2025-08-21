@@ -190,7 +190,13 @@
                   <input type="checkbox" class="h-4 w-4 text-blue-600 border-gray-300 rounded" />
                   <span>Ingat saya</span>
                 </label>
-                <a href="#" class="text-sm text-blue-600 hover:text-blue-700">Lupa kata sandi?</a>
+
+                <router-link
+                  class="text-sm text-blue-600 hover:text-blue-700 cursor-pointer"
+                  to="/forgot-password"
+                >
+                  Lupa kata sandi?
+                </router-link>
               </div>
 
               <div v-if="authStore.error" class="text-red-600 text-sm text-center">

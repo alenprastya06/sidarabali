@@ -1,33 +1,41 @@
 <template>
   <UserHeader />
   <div class="min-h-screen bg-gray-50">
-    <div class="max-w-7xl mx-auto px-6">
-      <button @click="goBack" class="flex items-center gap-2 py-2 rounded mb-5">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <button
+        @click="goBack"
+        class="flex items-center gap-2 py-2 rounded mb-3 sm:mb-5 text-sm sm:text-base"
+      >
         <i class="fa-solid fa-arrow-left"></i>
         Kembali
       </button>
-      <div class="mb-8">
-        <h1 class="text-xl font-bold text-gray-800 mb-2">Persyaratan Izin</h1>
-        <p class="text-gray-600">Lengkapi semua langkah berikut untuk mengajukan izin</p>
+
+      <div class="mb-6 sm:mb-8">
+        <h1 class="text-lg sm:text-xl lg:text-2xl font-bold text-gray-800 mb-2">
+          Persyaratan Izin
+        </h1>
+        <p class="text-sm sm:text-base text-gray-600">
+          Lengkapi semua langkah berikut untuk mengajukan izin
+        </p>
       </div>
 
-      <!-- Progress Steps -->
-      <div class="mb-8">
-        <div class="flex items-center justify-between">
+      <!-- Progress Steps - Mobile Optimized -->
+      <div class="mb-6 sm:mb-8">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-0">
           <div
             v-for="(step, index) in steps"
             :key="index"
             class="flex items-center"
-            :class="{ 'flex-1': index < steps.length - 1 }"
+            :class="{ 'sm:flex-1': index < steps.length - 1 }"
           >
-            <div class="flex items-center">
+            <div class="flex items-center w-full sm:w-auto">
               <div
-                class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold"
+                class="w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm font-semibold flex-shrink-0"
                 :class="getStepClass(index + 1)"
               >
                 <svg
                   v-if="isStepCompleted(index + 1)"
-                  class="w-5 h-5 text-white"
+                  class="w-3 h-3 sm:w-5 sm:h-5 text-white"
                   fill="currentColor"
                   viewBox="0 0 20 20"
                 >
@@ -37,10 +45,10 @@
                     clip-rule="evenodd"
                   />
                 </svg>
-                <span v-else>{{ index + 1 }}</span>
+                <span v-else class="text-xs sm:text-sm">{{ index + 1 }}</span>
               </div>
               <span
-                class="ml-2 text-sm font-medium"
+                class="ml-2 text-xs sm:text-sm font-medium"
                 :class="{
                   'text-green-600': isStepCompleted(index + 1),
                   'text-blue-600': currentStep === index + 1,
@@ -52,7 +60,7 @@
             </div>
             <div
               v-if="index < steps.length - 1"
-              class="flex-1 h-px mx-4"
+              class="hidden sm:flex flex-1 h-px mx-4"
               :class="{
                 'bg-green-400': isStepCompleted(index + 1),
                 'bg-gray-300': !isStepCompleted(index + 1),
@@ -62,17 +70,19 @@
         </div>
       </div>
 
-      <div v-if="isLoading" class="text-center py-12">
+      <div v-if="isLoading" class="text-center py-8 sm:py-12">
         <div class="inline-flex items-center">
-          <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mr-3"></div>
-          <p class="text-gray-600">Memuat data pengajuan...</p>
+          <div
+            class="animate-spin rounded-full h-5 w-5 sm:h-6 sm:w-6 border-b-2 border-blue-600 mr-3"
+          ></div>
+          <p class="text-sm sm:text-base text-gray-600">Memuat data pengajuan...</p>
         </div>
       </div>
 
-      <div v-else-if="error" class="text-center py-12">
-        <div class="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md mx-auto">
+      <div v-else-if="error" class="text-center py-8 sm:py-12">
+        <div class="bg-red-50 border border-red-200 rounded-lg p-4 sm:p-6 max-w-md mx-auto">
           <svg
-            class="w-12 h-12 text-red-400 mx-auto mb-4"
+            class="w-8 h-8 sm:w-12 sm:h-12 text-red-400 mx-auto mb-3 sm:mb-4"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -84,32 +94,42 @@
               d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16c-.77.833.192 2.5 1.732 2.5z"
             />
           </svg>
-          <p class="text-red-600 font-medium">Terjadi kesalahan</p>
-          <p class="text-red-500 text-sm mt-1">{{ error }}</p>
+          <p class="text-red-600 font-medium text-sm sm:text-base">Terjadi kesalahan</p>
+          <p class="text-red-500 text-xs sm:text-sm mt-1">{{ error }}</p>
           <button
             @click="fetchPengajuan"
-            class="mt-4 px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm rounded-md transition-colors"
+            class="mt-3 sm:mt-4 px-3 sm:px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-xs sm:text-sm rounded-md transition-colors"
           >
             Coba Lagi
           </button>
         </div>
       </div>
 
-      <div v-else class="space-y-6">
+      <div v-else class="space-y-4 sm:space-y-6">
+        <a
+          class="block bg-blue-600 text-white p-3 sm:p-4 rounded-lg text-center text-sm sm:text-base font-medium hover:bg-blue-700 transition-colors"
+          href="https://invitations.my.id/uploads/file-1755508254923726040-formatdokumenkelengkapan.docx"
+        >
+          📄 Download Template Kelengkapan Dokumen
+        </a>
+
         <!-- Step 1: Pilih Jenis Pengajuan -->
         <div v-if="currentStep === 1" class="bg-white rounded-lg shadow-sm border">
-          <div class="p-6 border-b border-gray-100">
-            <h2 class="text-xl font-semibold text-gray-800 flex items-center">
+          <div class="p-4 sm:p-6 border-b border-gray-100">
+            <h2 class="text-lg sm:text-xl font-semibold text-gray-800 flex items-center">
               <div
-                class="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mr-3 text-sm font-semibold"
+                class="w-6 h-6 sm:w-8 sm:h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mr-2 sm:mr-3 text-xs sm:text-sm font-semibold"
               >
                 1
               </div>
               Pilih Jenis Pengajuan
             </h2>
-            <p class="text-gray-600 mt-1 ml-11">Pilih jenis izin yang ingin Anda ajukan</p>
+            <p class="text-sm sm:text-base text-gray-600 mt-1 ml-8 sm:ml-11">
+              Pilih jenis izin yang ingin Anda ajukan
+            </p>
           </div>
-          <div class="p-6">
+
+          <div class="p-4 sm:p-6">
             <label class="block text-sm font-medium text-gray-700 mb-3">
               Jenis Pengajuan <span class="text-red-500">*</span>
             </label>
@@ -117,7 +137,7 @@
               <select
                 v-model="selectedPengajuanId"
                 @change="onPengajuanChange"
-                class="w-full bg-white border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                class="w-full bg-white border border-gray-300 rounded-lg px-3 sm:px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
               >
                 <option value="">Pilih jenis pengajuan...</option>
                 <option
@@ -138,42 +158,50 @@
                   }}
                 </option>
               </select>
-              <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                <svg
-                  class="w-5 h-5 text-gray-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-              </div>
             </div>
 
             <div
               v-if="selectedPengajuan"
-              class="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-100"
+              class="mt-4 p-3 sm:p-4 bg-blue-50 rounded-lg border border-blue-100"
             >
               <h4 class="text-sm font-medium text-blue-800 mb-2">Informasi Pengajuan</h4>
-              <p class="text-sm text-blue-700">{{ selectedPengajuan.name }}</p>
+              <p class="text-sm text-blue-700 font-medium">{{ selectedPengajuan.name }}</p>
               <p v-if="selectedPengajuan.description" class="text-xs text-blue-600 mt-1">
                 {{ selectedPengajuan.description }}
               </p>
+
+              <!-- Document requirements -->
+              <div class="mt-4">
+                <p class="text-sm font-medium text-blue-800">Mohon Siapkan Dokumen Pendukung:</p>
+                <ul
+                  v-if="selectedPengajuan.Persyaratans && selectedPengajuan.Persyaratans.length > 0"
+                  class="mt-2 space-y-1"
+                >
+                  <li
+                    v-for="(requirement, index) in selectedPengajuan.Persyaratans"
+                    :key="index"
+                    class="text-xs sm:text-sm text-blue-700 flex items-start"
+                  >
+                    <span
+                      class="inline-block w-1 h-1 bg-blue-600 rounded-full mt-2 mr-2 flex-shrink-0"
+                    ></span>
+                    <span class="capitalize">{{ requirement }}</span>
+                  </li>
+                </ul>
+                <p v-else class="text-sm text-blue-700 mt-2">
+                  Tidak ada dokumen tambahan yang diperlukan untuk pengajuan ini.
+                </p>
+              </div>
             </div>
 
             <!-- Warning untuk pengajuan yang tidak bisa dipilih -->
             <div
               v-if="hasActiveSubmissions"
-              class="mt-6 bg-amber-50 border border-amber-200 rounded-lg p-4"
+              class="mt-4 sm:mt-6 bg-amber-50 border border-amber-200 rounded-lg p-3 sm:p-4"
             >
               <div class="flex items-start">
                 <svg
-                  class="w-5 h-5 text-amber-600 mt-0.5 mr-3 flex-shrink-0"
+                  class="w-4 h-4 sm:w-5 sm:h-5 text-amber-600 mt-0.5 mr-2 sm:mr-3 flex-shrink-0"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -185,11 +213,11 @@
                     d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16c-.77.833.192 2.5 1.732 2.5z"
                   />
                 </svg>
-                <div class="flex-1">
+                <div class="flex-1 min-w-0">
                   <h3 class="text-sm font-medium text-amber-800">
                     Ada Pengajuan yang Sedang Diproses
                   </h3>
-                  <p class="text-sm text-amber-700 mt-1">
+                  <p class="text-xs sm:text-sm text-amber-700 mt-1">
                     Beberapa jenis pengajuan tidak dapat dipilih karena Anda memiliki pengajuan
                     aktif yang sedang diproses.
                   </p>
@@ -204,17 +232,23 @@
                         :key="pengajuan.id"
                         class="bg-white p-3 rounded-md border border-amber-200"
                       >
-                        <div class="flex items-center justify-between">
-                          <div class="flex-1">
-                            <p class="text-sm text-gray-800 font-medium">{{ pengajuan.name }}</p>
-                            <div class="flex items-center mt-1">
+                        <div
+                          class="space-y-2 sm:space-y-0 sm:flex sm:items-center sm:justify-between"
+                        >
+                          <div class="flex-1 min-w-0">
+                            <p class="text-sm text-gray-800 font-medium truncate">
+                              {{ pengajuan.name }}
+                            </p>
+                            <div
+                              class="flex flex-col sm:flex-row sm:items-center mt-1 gap-1 sm:gap-2"
+                            >
                               <span
-                                class="px-2 py-1 rounded text-xs font-medium"
+                                class="inline-flex px-2 py-1 rounded text-xs font-medium"
                                 :class="getStatusBadgeClass(pengajuan.pengajuan_aktif.status)"
                               >
                                 {{ getStatusMessage(pengajuan.pengajuan_aktif.status) }}
                               </span>
-                              <span class="text-xs text-gray-500 ml-2">
+                              <span class="text-xs text-gray-500">
                                 ID: {{ pengajuan.pengajuan_aktif.id_pengajuan }}
                               </span>
                             </div>
@@ -231,18 +265,20 @@
 
         <!-- Step 2: Data Pemilik & Lahan -->
         <div v-if="currentStep === 2" class="bg-white rounded-lg shadow-sm border">
-          <div class="p-6 border-b border-gray-100">
-            <h2 class="text-xl font-semibold text-gray-800 flex items-center">
+          <div class="p-4 sm:p-6 border-b border-gray-100">
+            <h2 class="text-lg sm:text-xl font-semibold text-gray-800 flex items-center">
               <div
-                class="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mr-3 text-sm font-semibold"
+                class="w-6 h-6 sm:w-8 sm:h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mr-2 sm:mr-3 text-xs sm:text-sm font-semibold"
               >
                 2
               </div>
               Data Pemilik & Lahan
             </h2>
-            <p class="text-gray-600 mt-1 ml-11">Lengkapi data pemilik dan informasi lahan</p>
+            <p class="text-sm sm:text-base text-gray-600 mt-1 ml-8 sm:ml-11">
+              Lengkapi data pemilik dan informasi lahan
+            </p>
           </div>
-          <div class="p-6">
+          <div class="p-4 sm:p-6">
             <PemiliDanLahan
               v-if="selectedPengajuanId"
               :idPengajuan="selectedPengajuanId"
@@ -254,16 +290,16 @@
 
         <!-- Step 3: Upload Dokumen -->
         <div v-if="currentStep === 3" class="bg-white rounded-lg shadow-sm border">
-          <div class="p-6 border-b border-gray-100">
-            <h2 class="text-xl font-semibold text-gray-800 flex items-center">
+          <div class="p-4 sm:p-6 border-b border-gray-100">
+            <h2 class="text-lg sm:text-xl font-semibold text-gray-800 flex items-center">
               <div
-                class="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mr-3 text-sm font-semibold"
+                class="w-6 h-6 sm:w-8 sm:h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mr-2 sm:mr-3 text-xs sm:text-sm font-semibold"
               >
                 3
               </div>
               Upload Dokumen Persyaratan
             </h2>
-            <p class="text-gray-600 mt-1 ml-11">
+            <p class="text-sm sm:text-base text-gray-600 mt-1 ml-8 sm:ml-11">
               {{
                 selectedPengajuan &&
                 (!selectedPengajuan.Persyaratans || selectedPengajuan.Persyaratans.length === 0)
@@ -272,108 +308,112 @@
               }}
             </p>
           </div>
-          <div class="p-6">
+          <div class="p-4 sm:p-6">
             <div
               v-if="
                 selectedPengajuan &&
                 selectedPengajuan.Persyaratans &&
                 selectedPengajuan.Persyaratans.length > 0
               "
-              class="space-y-6"
+              class="space-y-4 sm:space-y-6"
             >
               <div
                 v-for="(requirement, index) in selectedPengajuan.Persyaratans"
                 :key="index"
-                class="border border-gray-200 rounded-lg p-6 hover:border-gray-300 transition-colors"
+                class="border border-gray-200 rounded-lg p-4 sm:p-6 hover:border-gray-300 transition-colors"
               >
-                <div class="flex items-start">
-                  <div
-                    class="w-8 h-8 bg-gray-100 text-gray-700 rounded-full flex items-center justify-center text-sm font-semibold mr-4 flex-shrink-0 mt-1"
-                  >
-                    {{ index + 1 }}
-                  </div>
-                  <div class="flex-1">
-                    <h3 class="text-gray-900 font-medium mb-2 capitalize">{{ requirement }}</h3>
-
-                    <div class="flex items-center gap-2 mb-3">
-                      <span
-                        class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-50 text-red-700"
-                      >
-                        <span class="w-1 h-1 bg-red-400 rounded-full mr-1"></span>
-                        Wajib
-                      </span>
-                      <span class="text-xs text-gray-500">Maks. 10 MB</span>
+                <div class="space-y-4">
+                  <div class="flex items-start">
+                    <div
+                      class="w-6 h-6 sm:w-8 sm:h-8 bg-gray-100 text-gray-700 rounded-full flex items-center justify-center text-xs sm:text-sm font-semibold mr-3 sm:mr-4 flex-shrink-0 mt-1"
+                    >
+                      {{ index + 1 }}
                     </div>
+                    <div class="flex-1 min-w-0">
+                      <h3 class="text-sm sm:text-base text-gray-900 font-medium mb-2 capitalize">
+                        {{ requirement }}
+                      </h3>
 
-                    <div class="space-y-4">
-                      <div class="flex items-center gap-3">
-                        <button
-                          @click="selectFile(index)"
-                          class="inline-flex items-center px-4 py-2 bg-teal-500 hover:bg-teal-600 text-white rounded-lg text-sm font-medium transition-colors"
+                      <div class="flex flex-col sm:flex-row sm:items-center gap-2 mb-3">
+                        <span
+                          class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-50 text-red-700 w-fit"
                         >
-                          <svg
-                            class="w-4 h-4 mr-2"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="2"
-                              d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                            />
-                          </svg>
-                          Pilih File
-                        </button>
+                          <span class="w-1 h-1 bg-red-400 rounded-full mr-1"></span>
+                          Wajib
+                        </span>
+                        <span class="text-xs text-gray-500">Maks. 10 MB</span>
+                      </div>
+                    </div>
+                  </div>
 
-                        <div
-                          v-if="selectedFiles[index]"
-                          class="flex items-center bg-green-50 border border-green-200 rounded-lg px-3 py-2"
+                  <div class="space-y-4 ml-9 sm:ml-12">
+                    <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+                      <button
+                        @click="selectFile(index)"
+                        class="inline-flex items-center justify-center px-4 py-2 bg-teal-500 hover:bg-teal-600 text-white rounded-lg text-sm font-medium transition-colors w-full sm:w-auto"
+                      >
+                        <svg
+                          class="w-4 h-4 mr-2"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
                         >
-                          <svg
-                            class="w-4 h-4 text-green-500 mr-2"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="2"
-                              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                            />
-                          </svg>
-                          <span class="text-sm text-green-700">
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                          />
+                        </svg>
+                        Pilih File
+                      </button>
+
+                      <div
+                        v-if="selectedFiles[index]"
+                        class="flex items-center bg-green-50 border border-green-200 rounded-lg px-3 py-2 w-full sm:w-auto sm:flex-1"
+                      >
+                        <svg
+                          class="w-4 h-4 text-green-500 mr-2 flex-shrink-0"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                          />
+                        </svg>
+                        <div class="flex-1 min-w-0">
+                          <span class="text-sm text-green-700 font-medium block truncate">
                             {{ selectedFiles[index].name }}
-                            <span class="text-green-600 font-medium">
-                              ({{ (selectedFiles[index].size / (1024 * 1024)).toFixed(2) }} MB)
-                            </span>
+                          </span>
+                          <span class="text-xs text-green-600">
+                            ({{ (selectedFiles[index].size / (1024 * 1024)).toFixed(2) }} MB)
                           </span>
                         </div>
                       </div>
+                    </div>
 
-                      <div class="max-w-lg">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
-                          Catatan Tambahan (Opsional)
-                        </label>
-                        <textarea
-                          v-model="userNotes[index]"
-                          rows="2"
-                          placeholder="Tambahkan catatan untuk dokumen ini jika diperlukan..."
-                          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm resize-none"
-                        ></textarea>
-                      </div>
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Catatan Tambahan (Opsional)
+                      </label>
+                      <textarea
+                        v-model="userNotes[index]"
+                        rows="2"
+                        placeholder="Tambahkan catatan untuk dokumen ini jika diperlukan..."
+                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm resize-none"
+                      ></textarea>
                     </div>
 
                     <!-- Uploaded files display -->
                     <div
                       v-if="uploadedFiles[index] && uploadedFiles[index].length > 0"
-                      class="mt-4"
+                      class="space-y-3"
                     >
-                      <h4 class="text-sm font-medium text-gray-700 mb-2">
-                        File yang telah diupload:
-                      </h4>
+                      <h4 class="text-sm font-medium text-gray-700">File yang telah diupload:</h4>
                       <div class="space-y-2">
                         <div
                           v-for="file in uploadedFiles[index]"
@@ -381,9 +421,9 @@
                           class="bg-gray-50 border border-gray-200 rounded-lg p-3"
                         >
                           <div class="flex items-center justify-between">
-                            <div class="flex items-center flex-1">
+                            <div class="flex items-center flex-1 min-w-0">
                               <svg
-                                class="w-4 h-4 text-gray-400 mr-2"
+                                class="w-4 h-4 text-gray-400 mr-2 flex-shrink-0"
                                 fill="none"
                                 stroke="currentColor"
                                 viewBox="0 0 24 24"
@@ -395,12 +435,16 @@
                                   d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                                 />
                               </svg>
-                              <span class="text-sm text-gray-700 font-medium">{{ file.name }}</span>
-                              <span class="text-xs text-gray-500 ml-2">({{ file.size }})</span>
+                              <div class="flex-1 min-w-0">
+                                <span class="text-sm text-gray-700 font-medium block truncate">{{
+                                  file.name
+                                }}</span>
+                                <span class="text-xs text-gray-500">({{ file.size }})</span>
+                              </div>
                             </div>
                             <button
                               @click="removeFile(index, file.id)"
-                              class="text-red-500 hover:text-red-700 p-1"
+                              class="text-red-500 hover:text-red-700 p-1 ml-2 flex-shrink-0"
                               title="Hapus file"
                             >
                               <svg
@@ -437,11 +481,13 @@
                 selectedPengajuan &&
                 (!selectedPengajuan.Persyaratans || selectedPengajuan.Persyaratans.length === 0)
               "
-              class="text-center py-12"
+              class="text-center py-8 sm:py-12"
             >
-              <div class="bg-green-50 border border-green-200 rounded-lg p-6 max-w-md mx-auto">
+              <div
+                class="bg-green-50 border border-green-200 rounded-lg p-4 sm:p-6 max-w-md mx-auto"
+              >
                 <svg
-                  class="w-12 h-12 text-green-400 mx-auto mb-4"
+                  class="w-8 h-8 sm:w-12 sm:h-12 text-green-400 mx-auto mb-3 sm:mb-4"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -453,7 +499,9 @@
                     d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
                   />
                 </svg>
-                <h3 class="text-lg font-medium text-green-800 mb-2">Tidak Ada Dokumen Tambahan</h3>
+                <h3 class="text-base sm:text-lg font-medium text-green-800 mb-2">
+                  Tidak Ada Dokumen Tambahan
+                </h3>
                 <p class="text-sm text-green-700">
                   Pengajuan "{{ selectedPengajuan.name }}" tidak memerlukan dokumen tambahan. Anda
                   dapat langsung melanjutkan ke langkah berikutnya.
@@ -465,70 +513,87 @@
 
         <!-- Step 4: Review & Submit -->
         <div v-if="currentStep === 4" class="bg-white rounded-lg shadow-sm border">
-          <div class="p-6 border-b border-gray-100">
-            <h2 class="text-xl font-semibold text-gray-800 flex items-center">
+          <div class="p-4 sm:p-6 border-b border-gray-100">
+            <h2 class="text-lg sm:text-xl font-semibold text-gray-800 flex items-center">
               <div
-                class="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mr-3 text-sm font-semibold"
+                class="w-6 h-6 sm:w-8 sm:h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mr-2 sm:mr-3 text-xs sm:text-sm font-semibold"
               >
                 4
               </div>
               Review & Submit
             </h2>
-            <p class="text-gray-600 mt-1 ml-11">
+            <p class="text-sm sm:text-base text-gray-600 mt-1 ml-8 sm:ml-11">
               Periksa kembali semua data sebelum mengirim pengajuan
             </p>
           </div>
-          <div class="p-6 space-y-6">
+          <div class="p-4 sm:p-6 space-y-4 sm:space-y-6">
             <!-- Review Jenis Pengajuan -->
-            <div class="border border-gray-200 rounded-lg p-4">
+            <div class="border border-gray-200 rounded-lg p-3 sm:p-4">
               <h3 class="text-sm font-semibold text-gray-700 mb-2">Jenis Pengajuan</h3>
-              <p class="text-gray-900">{{ selectedPengajuan?.name }}</p>
+              <p class="text-sm sm:text-base text-gray-900">{{ selectedPengajuan?.name }}</p>
             </div>
 
             <!-- Review Data Pemilik -->
-            <div v-if="hasOwnerData" class="border border-gray-200 rounded-lg p-4">
+            <div v-if="hasOwnerData" class="border border-gray-200 rounded-lg p-3 sm:p-4">
               <h3 class="text-sm font-semibold text-gray-700 mb-3">Data Pemilik</h3>
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                <div>
-                  <span class="text-gray-600">Nama:</span>
-                  <span class="font-medium">{{ ownerData.nama }}</span>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 text-sm">
+                <div class="flex flex-col sm:flex-row sm:items-center">
+                  <span class="text-gray-600 text-xs sm:text-sm font-medium sm:w-20">Nama:</span>
+                  <span class="font-medium text-sm">{{ ownerData.nama }}</span>
                 </div>
-                <div>
-                  <span class="text-gray-600">NIK:</span>
-                  <span class="font-medium">{{ ownerData.nik }}</span>
+                <div class="flex flex-col sm:flex-row sm:items-center">
+                  <span class="text-gray-600 text-xs sm:text-sm font-medium sm:w-20">NIK:</span>
+                  <span class="font-medium text-sm">{{ ownerData.nik }}</span>
                 </div>
-                <div>
-                  <span class="text-gray-600">Email:</span>
-                  <span class="font-medium">{{ ownerData.email }}</span>
+                <div class="flex flex-col sm:flex-row sm:items-center">
+                  <span class="text-gray-600 text-xs sm:text-sm font-medium sm:w-20">Email:</span>
+                  <span class="font-medium text-sm break-all">{{ ownerData.email }}</span>
                 </div>
-                <div v-if="ownerData.phone || ownerData.no_hp">
-                  <span class="text-gray-600">Telepon:</span>
-                  <span class="font-medium">{{ ownerData.phone || ownerData.no_hp }}</span>
+                <div
+                  v-if="ownerData.phone || ownerData.no_hp"
+                  class="flex flex-col sm:flex-row sm:items-center"
+                >
+                  <span class="text-gray-600 text-xs sm:text-sm font-medium sm:w-20">Telepon:</span>
+                  <span class="font-medium text-sm">{{ ownerData.phone || ownerData.no_hp }}</span>
                 </div>
               </div>
             </div>
 
             <!-- Review Data Lahan -->
-            <div v-if="hasLahanData" class="border border-gray-200 rounded-lg p-4">
+            <div v-if="hasLahanData" class="border border-gray-200 rounded-lg p-3 sm:p-4">
               <h3 class="text-sm font-semibold text-gray-700 mb-3">Data Lahan</h3>
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                <div>
-                  <span class="text-gray-600">Jenis Bangunan:</span>
-                  <span class="font-medium">{{ lahanData.jenis_bangunan }}</span>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 text-sm">
+                <div class="flex flex-col sm:flex-row sm:items-center">
+                  <span class="text-gray-600 text-xs sm:text-sm font-medium sm:w-24"
+                    >Jenis Bangunan:</span
+                  >
+                  <span class="font-medium text-sm">{{ lahanData.jenis_bangunan }}</span>
                 </div>
-                <div>
-                  <span class="text-gray-600">Luas Lahan:</span>
-                  <span class="font-medium">{{ lahanData.luas_lahan }} m²</span>
+                <div class="flex flex-col sm:flex-row sm:items-center">
+                  <span class="text-gray-600 text-xs sm:text-sm font-medium sm:w-24"
+                    >Luas Lahan:</span
+                  >
+                  <span class="font-medium text-sm">{{ lahanData.luas_lahan }} m²</span>
                 </div>
-                <div v-if="lahanData.kelurahan || lahanData.wilayah_kelurahan">
-                  <span class="text-gray-600">Kelurahan:</span>
-                  <span class="font-medium">{{
+                <div
+                  v-if="lahanData.kelurahan || lahanData.wilayah_kelurahan"
+                  class="flex flex-col sm:flex-row sm:items-center"
+                >
+                  <span class="text-gray-600 text-xs sm:text-sm font-medium sm:w-24"
+                    >Kelurahan:</span
+                  >
+                  <span class="font-medium text-sm">{{
                     lahanData.kelurahan || lahanData.wilayah_kelurahan
                   }}</span>
                 </div>
-                <div v-if="lahanData.kecamatan || lahanData.wilayah_kecamatan">
-                  <span class="text-gray-600">Kecamatan:</span>
-                  <span class="font-medium">{{
+                <div
+                  v-if="lahanData.kecamatan || lahanData.wilayah_kecamatan"
+                  class="flex flex-col sm:flex-row sm:items-center"
+                >
+                  <span class="text-gray-600 text-xs sm:text-sm font-medium sm:w-24"
+                    >Kecamatan:</span
+                  >
+                  <span class="font-medium text-sm">{{
                     lahanData.kecamatan || lahanData.wilayah_kecamatan
                   }}</span>
                 </div>
@@ -542,40 +607,45 @@
                 selectedPengajuan.Persyaratans &&
                 selectedPengajuan.Persyaratans.length > 0
               "
-              class="border border-gray-200 rounded-lg p-4"
+              class="border border-gray-200 rounded-lg p-3 sm:p-4"
             >
               <h3 class="text-sm font-semibold text-gray-700 mb-3">Dokumen yang Akan Disubmit</h3>
-              <div class="space-y-3">
+              <div class="space-y-2 sm:space-y-3">
                 <div
                   v-for="(requirement, index) in selectedPengajuan.Persyaratans"
                   :key="index"
-                  class="flex items-center justify-between p-3 bg-gray-50 rounded-md"
+                  class="flex items-start justify-between p-2 sm:p-3 bg-gray-50 rounded-md"
                 >
-                  <div class="flex-1">
-                    <p class="text-sm font-medium text-gray-900 capitalize">{{ requirement }}</p>
-                    <div v-if="selectedFiles[index]" class="text-xs text-gray-600 mt-1">
-                      File: {{ selectedFiles[index].name }}
-                      <span v-if="userNotes[index]" class="ml-2"
-                        >• Catatan: {{ userNotes[index] }}</span
-                      >
+                  <div class="flex-1 min-w-0 mr-3">
+                    <p class="text-sm font-medium text-gray-900 capitalize mb-1">
+                      {{ requirement }}
+                    </p>
+                    <div v-if="selectedFiles[index]" class="text-xs text-gray-600">
+                      <span class="font-medium">File:</span>
+                      <span class="truncate">{{ selectedFiles[index].name }}</span>
+                      <div v-if="userNotes[index]" class="mt-1">
+                        <span class="font-medium">Catatan:</span> {{ userNotes[index] }}
+                      </div>
                     </div>
                     <div
                       v-else-if="uploadedFiles[index] && uploadedFiles[index].length > 0"
-                      class="text-xs text-gray-600 mt-1"
+                      class="text-xs text-gray-600"
                     >
-                      File: {{ uploadedFiles[index][0].name }}
-                      <span v-if="uploadedFiles[index][0].user_note" class="ml-2"
-                        >• Catatan: {{ uploadedFiles[index][0].user_note }}</span
-                      >
+                      <span class="font-medium">File:</span>
+                      <span class="truncate">{{ uploadedFiles[index][0].name }}</span>
+                      <div v-if="uploadedFiles[index][0].user_note" class="mt-1">
+                        <span class="font-medium">Catatan:</span>
+                        {{ uploadedFiles[index][0].user_note }}
+                      </div>
                     </div>
                   </div>
-                  <div class="flex items-center ml-3">
+                  <div class="flex items-center ml-2 flex-shrink-0">
                     <svg
                       v-if="
                         selectedFiles[index] ||
                         (uploadedFiles[index] && uploadedFiles[index].length > 0)
                       "
-                      class="w-5 h-5 text-green-500"
+                      class="w-4 h-4 sm:w-5 sm:h-5 text-green-500"
                       fill="currentColor"
                       viewBox="0 0 20 20"
                     >
@@ -587,7 +657,7 @@
                     </svg>
                     <svg
                       v-else
-                      class="w-5 h-5 text-red-400"
+                      class="w-4 h-4 sm:w-5 sm:h-5 text-red-400"
                       fill="currentColor"
                       viewBox="0 0 20 20"
                     >
@@ -603,10 +673,13 @@
             </div>
 
             <!-- Validation Messages -->
-            <div v-if="!canSubmit" class="bg-amber-50 border border-amber-200 rounded-lg p-4">
+            <div
+              v-if="!canSubmit"
+              class="bg-amber-50 border border-amber-200 rounded-lg p-3 sm:p-4"
+            >
               <div class="flex items-start">
                 <svg
-                  class="w-5 h-5 text-amber-600 mt-0.5 mr-3"
+                  class="w-4 h-4 sm:w-5 sm:h-5 text-amber-600 mt-0.5 mr-2 sm:mr-3 flex-shrink-0"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -630,15 +703,15 @@
             </div>
 
             <!-- Submit Button -->
-            <div class="border-t border-gray-100 pt-6">
+            <div class="border-t border-gray-100 pt-4 sm:pt-6">
               <button
                 @click="submitDocuments"
                 :disabled="!canSubmit"
-                class="w-full px-6 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors flex items-center justify-center"
+                class="w-full px-4 sm:px-6 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors flex items-center justify-center text-sm sm:text-base"
               >
                 <svg
                   v-if="!canSubmit"
-                  class="w-5 h-5 mr-2"
+                  class="w-4 h-4 sm:w-5 sm:h-5 mr-2"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -652,7 +725,7 @@
                 </svg>
                 <svg
                   v-else
-                  class="w-5 h-5 mr-2"
+                  class="w-4 h-4 sm:w-5 sm:h-5 mr-2"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -671,7 +744,7 @@
                 }}
               </button>
 
-              <p class="text-xs text-gray-500 text-center mt-2">
+              <p class="text-xs text-gray-500 text-center mt-2 px-2">
                 Dengan mengirim pengajuan ini, Anda menyetujui bahwa semua data yang diberikan
                 adalah benar dan akurat.
               </p>
@@ -680,11 +753,13 @@
         </div>
 
         <!-- Navigation Buttons -->
-        <div class="flex items-center justify-between pt-6">
+        <div
+          class="flex flex-col sm:flex-row sm:items-center sm:justify-between pt-4 sm:pt-6 gap-3 sm:gap-0"
+        >
           <button
             v-if="currentStep > 1"
             @click="previousStep"
-            class="inline-flex items-center px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg font-medium transition-colors"
+            class="inline-flex items-center justify-center px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg font-medium transition-colors text-sm sm:text-base order-2 sm:order-1"
           >
             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
@@ -697,12 +772,12 @@
             Sebelumnya
           </button>
 
-          <div v-else></div>
+          <div v-else class="hidden sm:block"></div>
 
           <button
             v-if="currentStep < maxStep && canGoToNextStep"
             @click="nextStep"
-            class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
+            class="inline-flex items-center justify-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors text-sm sm:text-base order-1 sm:order-2"
           >
             Selanjutnya
             <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -739,6 +814,7 @@ const uploadedFiles = ref({})
 const selectedFiles = ref({})
 const userNotes = ref({})
 const requirementMessages = ref({})
+const hasHGB = ref(null) // Track HGB status
 
 // Data dari child component
 const ownerData = ref(null)
@@ -769,6 +845,17 @@ const selectedPengajuan = computed(() => {
   const pengajuan = pengajuanList.value.find((p) => p.id === selectedPengajuanId.value)
   if (pengajuan && !Array.isArray(pengajuan.Persyaratans)) {
     pengajuan.Persyaratans = []
+  }
+  // Filter out "surat keterangan dari kecamatan" if hasHGB is true
+  if (
+    pengajuan &&
+    pengajuan.name.trim().toLowerCase() ===
+      'standar pelayanan kelengkapan administrasi permohonan rekomendasi hak atas tanah' &&
+    hasHGB.value === true
+  ) {
+    pengajuan.Persyaratans = pengajuan.Persyaratans.filter(
+      (req) => req.toLowerCase() !== 'surat keterangan dari kecamatan',
+    )
   }
   return pengajuan
 })
@@ -935,11 +1022,29 @@ const fetchPengajuan = async () => {
   }
 }
 
-const onPengajuanChange = () => {
+const onPengajuanChange = async () => {
+  console.log('onPengajuanChange triggered, selectedPengajuanId:', selectedPengajuanId.value)
   const selected = pengajuanList.value.find((p) => p.id === selectedPengajuanId.value)
+
+  // Reset state if no selection
+  if (!selected) {
+    console.log('No pengajuan selected, resetting state')
+    hasHGB.value = null
+    uploadedFiles.value = {}
+    selectedFiles.value = {}
+    userNotes.value = {}
+    requirementMessages.value = {}
+    ownerData.value = null
+    lahanData.value = null
+    currentStep.value = 1
+    return
+  }
+
+  console.log('Selected pengajuan:', selected.name)
 
   // Check if selected pengajuan has active submission
   if (selected && selected.pengajuan_aktif) {
+    console.log('Active submission found:', selected.pengajuan_aktif)
     Swal.fire({
       icon: 'warning',
       title: 'Pengajuan Tidak Dapat Dipilih',
@@ -949,7 +1054,43 @@ const onPengajuanChange = () => {
 
     // Reset selection
     selectedPengajuanId.value = ''
+    hasHGB.value = null
     return
+  }
+
+  // Check for the specific pengajuan
+  const targetPengajuan =
+    'standar pelayanan kelengkapan administrasi permohonan rekomendasi hak atas tanah'
+  if (selected && selected.name.trim().toLowerCase() === targetPengajuan) {
+    console.log('Target pengajuan matched, showing Swal prompt')
+    try {
+      const result = await Swal.fire({
+        icon: 'question',
+        title: 'Konfirmasi Surat Hak Guna Bangunan',
+        text: 'Apakah Anda memiliki Surat Hak Guna Bangunan?',
+        showCancelButton: true,
+        confirmButtonText: 'Ya, saya memiliki HGB',
+        cancelButtonText: 'Tidak',
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+      })
+
+      hasHGB.value = result.isConfirmed
+      console.log('HGB status set to:', hasHGB.value)
+    } catch (error) {
+      console.error('Swal error:', error)
+      Swal.fire({
+        icon: 'error',
+        title: 'Kesalahan',
+        text: 'Gagal menampilkan konfirmasi HGB. Silakan coba lagi.',
+        confirmButtonColor: '#ef4444',
+      })
+      hasHGB.value = null
+      return
+    }
+  } else {
+    console.log('Not the target pengajuan, resetting HGB')
+    hasHGB.value = null
   }
 
   // Reset all data if selection is valid
@@ -1139,15 +1280,19 @@ const submitDocuments = async () => {
         return
       }
 
-      // Process selected files (new uploads)
-      for (const [requirementIndex, file] of Object.entries(selectedFiles.value)) {
-        if (file) {
-          const userNote = userNotes.value[requirementIndex] || ''
-          try {
-            console.log(`Uploading file: ${file.name}`)
+      // Process documents for each requirement
+      for (let i = 0; i < selectedPengajuan.value.Persyaratans.length; i++) {
+        const requirementName = selectedPengajuan.value.Persyaratans[i]
 
-            const uploadResult = await uploadFile(parseInt(requirementIndex), file, userNote)
-            const requirementName = selectedPengajuan.value.Persyaratans[parseInt(requirementIndex)]
+        // Priority: selectedFiles (new upload) over uploadedFiles (existing)
+        if (selectedFiles.value[i]) {
+          // Process new file upload
+          const file = selectedFiles.value[i]
+          const userNote = userNotes.value[i] || ''
+
+          try {
+            console.log(`Uploading new file: ${file.name}`)
+            const uploadResult = await uploadFile(i, file, userNote)
 
             documents.push({
               document_type: requirementName,
@@ -1159,7 +1304,6 @@ const submitDocuments = async () => {
             })
           } catch (error) {
             console.error(`Upload error for ${file.name}:`, error)
-
             Swal.fire({
               icon: 'error',
               title: 'Gagal Upload File',
@@ -1168,20 +1312,14 @@ const submitDocuments = async () => {
             })
             return
           }
-        }
-      }
-
-      // Process previously uploaded files
-      for (const [requirementIndex, files] of Object.entries(uploadedFiles.value)) {
-        const requirementName = selectedPengajuan.value.Persyaratans[parseInt(requirementIndex)]
-
-        if (files && files.length > 0 && requirementName) {
-          for (const fileObj of files) {
+        } else if (uploadedFiles.value[i] && uploadedFiles.value[i].length > 0) {
+          // Process existing uploaded files (only if no new file selected)
+          for (const fileObj of uploadedFiles.value[i]) {
             documents.push({
               document_type: requirementName,
               file_url: fileObj.path,
               original_name: fileObj.name.replace(/\s*\(\d+(?:\.\d+)?\s*MB\)$/, '').trim(),
-              mime_type: 'application/pdf',
+              mime_type: 'application/pdf', // Default, you might want to store actual mime type
               file_size: Math.round(parseFloat(fileObj.size.replace(' MB', '')) * 1024 * 1024),
               user_note: fileObj.user_note || '',
             })
@@ -1221,6 +1359,7 @@ const submitDocuments = async () => {
     }
 
     console.log('Submitting payload:', payload)
+    console.log('Total documents to submit:', documents.length)
 
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), 30000)
@@ -1253,6 +1392,7 @@ const submitDocuments = async () => {
         ownerData.value = null
         lahanData.value = null
         selectedPengajuanId.value = ''
+        hasHGB.value = null
         currentStep.value = 1
 
         // Refresh data
@@ -1289,8 +1429,8 @@ const submitDocuments = async () => {
     })
   }
 }
-
 onMounted(() => {
+  console.log('Component mounted, fetching pengajuan')
   fetchPengajuan()
 })
 </script>
