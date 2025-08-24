@@ -49,11 +49,6 @@
           <div class="bg-white/90 backdrop-blur rounded-2xl shadow-xl border border-gray-100 p-8">
             <div class="mb-8">
               <div class="flex items-center space-x-3">
-                <img
-                  class="w-10 h-10"
-                  src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/Coat_of_arms_of_Jakarta.svg/1814px-Coat_of_arms_of_Jakarta.svg.png"
-                  alt=""
-                />
                 <h2 class="text-2xl font-bold text-gray-900">Masuk ke akun</h2>
               </div>
               <p class="mt-2 text-sm text-gray-500">
