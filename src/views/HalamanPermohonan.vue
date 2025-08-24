@@ -796,7 +796,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, provide } from 'vue'
+import { ref, computed, onMounted, provide, nextTick } from 'vue'
 import axios from 'axios'
 import Swal from 'sweetalert2'
 import UserHeader from './UserHeader.vue'
@@ -843,23 +843,36 @@ provide('selectedPengajuanId', selectedPengajuanId)
 // Computed properties
 const selectedPengajuan = computed(() => {
   const pengajuan = pengajuanList.value.find((p) => p.id === selectedPengajuanId.value)
+
+  if (!pengajuan) return null
+
+  // Pastikan Persyaratans adalah array
   if (pengajuan && !Array.isArray(pengajuan.Persyaratans)) {
     pengajuan.Persyaratans = []
   }
+
   // Filter out "surat keterangan dari kecamatan" if hasHGB is true
+  // Gunakan debounce atau setTimeout untuk menghindari perubahan berulang
   if (
     pengajuan &&
     pengajuan.name.trim().toLowerCase() ===
       'standar pelayanan kelengkapan administrasi permohonan rekomendasi hak atas tanah' &&
     hasHGB.value === true
   ) {
-    pengajuan.Persyaratans = pengajuan.Persyaratans.filter(
+    // Buat salinan array untuk menghindari mutasi langsung
+    const filteredRequirements = pengajuan.Persyaratans.filter(
       (req) => req.toLowerCase() !== 'surat keterangan dari kecamatan',
     )
+
+    // Return objek baru untuk menghindari mutasi reaktif
+    return {
+      ...pengajuan,
+      Persyaratans: filteredRequirements,
+    }
   }
+
   return pengajuan
 })
-
 // New computed properties for active submissions
 const hasActiveSubmissions = computed(() => {
   return pengajuanList.value.some((p) => p.pengajuan_aktif)
@@ -1024,10 +1037,9 @@ const fetchPengajuan = async () => {
 
 const onPengajuanChange = async () => {
   console.log('onPengajuanChange triggered, selectedPengajuanId:', selectedPengajuanId.value)
-  const selected = pengajuanList.value.find((p) => p.id === selectedPengajuanId.value)
 
-  // Reset state if no selection
-  if (!selected) {
+  // Jika tidak ada yang dipilih, reset state
+  if (!selectedPengajuanId.value) {
     console.log('No pengajuan selected, resetting state')
     hasHGB.value = null
     uploadedFiles.value = {}
@@ -1040,11 +1052,22 @@ const onPengajuanChange = async () => {
     return
   }
 
+  const selected = pengajuanList.value.find((p) => p.id === selectedPengajuanId.value)
+
+  if (!selected) {
+    console.log('Selected pengajuan not found')
+    return
+  }
+
   console.log('Selected pengajuan:', selected.name)
 
   // Check if selected pengajuan has active submission
-  if (selected && selected.pengajuan_aktif) {
+  if (selected.pengajuan_aktif) {
     console.log('Active submission found:', selected.pengajuan_aktif)
+
+    // Gunakan nextTick untuk menghindari perubahan reaktif selama render
+    await nextTick()
+
     Swal.fire({
       icon: 'warning',
       title: 'Pengajuan Tidak Dapat Dipilih',
@@ -1052,7 +1075,8 @@ const onPengajuanChange = async () => {
       confirmButtonColor: '#f59e0b',
     })
 
-    // Reset selection
+    // Reset selection menggunakan nextTick
+    await nextTick()
     selectedPengajuanId.value = ''
     hasHGB.value = null
     return
@@ -1061,22 +1085,37 @@ const onPengajuanChange = async () => {
   // Check for the specific pengajuan
   const targetPengajuan =
     'standar pelayanan kelengkapan administrasi permohonan rekomendasi hak atas tanah'
-  if (selected && selected.name.trim().toLowerCase() === targetPengajuan) {
-    console.log('Target pengajuan matched, showing Swal prompt')
-    try {
-      const result = await Swal.fire({
-        icon: 'question',
-        title: 'Konfirmasi Surat Hak Guna Bangunan',
-        text: 'Apakah Anda memiliki Surat Hak Guna Bangunan?',
-        showCancelButton: true,
-        confirmButtonText: 'Ya, saya memiliki HGB',
-        cancelButtonText: 'Tidak',
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-      })
 
-      hasHGB.value = result.isConfirmed
-      console.log('HGB status set to:', hasHGB.value)
+  if (selected.name.trim().toLowerCase() === targetPengajuan) {
+    console.log('Target pengajuan matched, showing Swal prompt')
+
+    try {
+      // Gunakan setTimeout untuk memastikan dialog muncul setelah render selesai
+      setTimeout(async () => {
+        const result = await Swal.fire({
+          icon: 'question',
+          title: 'Konfirmasi Surat Hak Guna Bangunan',
+          text: 'Apakah Anda memiliki Surat Hak Guna Bangunan?',
+          showCancelButton: true,
+          confirmButtonText: 'Ya, saya memiliki HGB',
+          cancelButtonText: 'Tidak',
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+        })
+
+        // Setelah dialog selesai, update state
+        hasHGB.value = result.isConfirmed
+        console.log('HGB status set to:', hasHGB.value)
+
+        // Reset data lainnya
+        uploadedFiles.value = {}
+        selectedFiles.value = {}
+        userNotes.value = {}
+        requirementMessages.value = {}
+        ownerData.value = null
+        lahanData.value = null
+        currentStep.value = 1
+      }, 100)
     } catch (error) {
       console.error('Swal error:', error)
       Swal.fire({
@@ -1086,23 +1125,23 @@ const onPengajuanChange = async () => {
         confirmButtonColor: '#ef4444',
       })
       hasHGB.value = null
-      return
     }
   } else {
     console.log('Not the target pengajuan, resetting HGB')
+    // Gunakan nextTick untuk update state
+    await nextTick()
     hasHGB.value = null
+
+    // Reset data lainnya
+    uploadedFiles.value = {}
+    selectedFiles.value = {}
+    userNotes.value = {}
+    requirementMessages.value = {}
+    ownerData.value = null
+    lahanData.value = null
+    currentStep.value = 1
   }
-
-  // Reset all data if selection is valid
-  uploadedFiles.value = {}
-  selectedFiles.value = {}
-  userNotes.value = {}
-  requirementMessages.value = {}
-  ownerData.value = null
-  lahanData.value = null
-  currentStep.value = 1
 }
-
 // File handling methods
 const selectFile = (requirementIndex) => {
   const input = document.createElement('input')

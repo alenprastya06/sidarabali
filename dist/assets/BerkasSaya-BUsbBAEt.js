@@ -1,0 +1,1 @@
+import{E as a,c as s,b as n,d as r,e as t,f as o,F as c}from"./index-BVhOrBYu.js";const p=a({__name:"BerkasSaya",setup(l){return(m,e)=>(n(),s(c,null,[r(o),e[0]||(e[0]=t("h2",null,"Berkas Saya",-1))],64))}});export{p as default};

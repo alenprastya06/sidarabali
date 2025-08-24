@@ -128,7 +128,14 @@ const roleColor = computed(() => {
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="hidden md:flex justify-between items-center h-16">
         <div class="flex items-center">
-          <span class="text-xl font-bold text-orange-600 mr-8">SIDARABALI</span>
+          <img
+            class="w-6 h-7"
+            src="https://upload.wikimedia.org/wikipedia/commons/e/eb/Coat_of_arms_of_Jakarta.svg"
+            alt=""
+          />
+          <router-link to="/user/dashboard">
+            <span class="text-xl font-bold text-orange-600 mr-8 ml-4">SIDARABALI</span>
+          </router-link>
         </div>
 
         <div class="flex-grow flex justify-center">
