@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gray-50 py-8">
+  <div class="min-h-screen py-8">
     <div class="w-full mx-auto px-4 sm:px-6 lg:px-8">
       <div v-if="loading" class="flex justify-center items-center py-12">
         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-600"></div>
@@ -302,7 +302,14 @@ import { ref, onMounted, computed } from 'vue'
 import PengajuanDetailModal from './Admin/PengajuanDetailModal.vue'
 import PengajuanActionModal from './Admin/PengajuanActionModal.vue'
 import axios from 'axios'
+import kelurahanImage from '@/assets/kelurahan.jpeg'
 
+const backgroundStyle = computed(() => ({
+  backgroundImage: `url(${kelurahanImage})`,
+  backgroundSize: 'cover',
+  backgroundPosition: 'center',
+  backgroundRepeat: 'no-repeat',
+}))
 // Reactive data
 const loading = ref(true)
 const error = ref(null)

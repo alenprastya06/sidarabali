@@ -131,7 +131,7 @@
 
           <div class="p-4 sm:p-6">
             <label class="block text-sm font-medium text-gray-700 mb-3">
-              Jenis Pengajuan <span class="text-red-500">*</span>
+              Jenis Pengajuan <span class="text-red-500"></span>
             </label>
             <div class="relative">
               <select
@@ -339,7 +339,6 @@
                           class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-50 text-red-700 w-fit"
                         >
                           <span class="w-1 h-1 bg-red-400 rounded-full mr-1"></span>
-                          Wajib
                         </span>
                         <span class="text-xs text-gray-500">Maks. 10 MB</span>
                       </div>
@@ -696,7 +695,7 @@
                   <div class="text-sm text-amber-700 mt-1 space-y-1">
                     <p v-if="!hasOwnerData">• Data pemilik belum lengkap</p>
                     <p v-if="!hasLahanData">• Data lahan belum lengkap</p>
-                    <p v-if="hasMissingDocuments">• Masih ada dokumen yang belum diupload</p>
+                    <!-- <p v-if="hasMissingDocuments">• Masih ada dokumen yang belum diupload</p> -->
                   </div>
                 </div>
               </div>
@@ -895,10 +894,10 @@ const hasLahanData = computed(() => {
 })
 
 const hasMissingDocuments = computed(() => {
-  if (!selectedPengajuan.value?.Persyaratans || selectedPengajuan.value.Persyaratans.length === 0) {
-    return false
-  }
-
+  // if (!selectedPengajuan.value?.Persyaratans || selectedPengajuan.value.Persyaratans.length === 0) {
+  //   return false
+  // }
+  return false
   for (let i = 0; i < selectedPengajuan.value.Persyaratans.length; i++) {
     const hasSelectedFile = selectedFiles.value[i]
     const hasUploadedFile = uploadedFiles.value[i] && uploadedFiles.value[i].length > 0
@@ -913,12 +912,10 @@ const canSubmit = computed(() => {
   if (!selectedPengajuan.value) return false
   if (!hasOwnerData.value || !hasLahanData.value) return false
 
-  // Jika tidak ada persyaratan, bisa submit
-  if (!selectedPengajuan.value.Persyaratans || selectedPengajuan.value.Persyaratans.length === 0)
-    return true
+  // if (!selectedPengajuan.value.Persyaratans || selectedPengajuan.value.Persyaratans.length === 0)
+  return true
 
-  // Check all requirements
-  return !hasMissingDocuments.value
+  // return !hasMissingDocuments.value
 })
 
 const canGoToNextStep = computed(() => {
@@ -928,7 +925,8 @@ const canGoToNextStep = computed(() => {
     case 2:
       return hasOwnerData.value && hasLahanData.value
     case 3:
-      return !hasMissingDocuments.value
+      // return !hasMissingDocuments.value
+      return true
     default:
       return true
   }
@@ -988,11 +986,12 @@ const isStepCompleted = (step) => {
     case 2:
       return hasOwnerData.value && hasLahanData.value
     case 3:
-      return (
-        !hasMissingDocuments.value ||
-        !selectedPengajuan.value?.Persyaratans ||
-        selectedPengajuan.value.Persyaratans.length === 0
-      )
+      return true
+    // return (
+    //   !hasMissingDocuments.value ||
+    //   !selectedPengajuan.value?.Persyaratans ||
+    //   selectedPengajuan.value.Persyaratans.length === 0
+    // )
     case 4:
       return canSubmit.value
     default:
@@ -1309,15 +1308,15 @@ const submitDocuments = async () => {
         }
       }
 
-      if (missingRequirements.length > 0) {
-        Swal.fire({
-          icon: 'warning',
-          title: 'Dokumen Belum Lengkap',
-          html: `Dokumen berikut masih diperlukan:<br/><br/><strong>${missingRequirements.map((req) => req.charAt(0).toUpperCase() + req.slice(1)).join('<br/>')}</strong>`,
-          confirmButtonColor: '#f59e0b',
-        })
-        return
-      }
+      // if (missingRequirements.length > 0) {
+      //   Swal.fire({
+      //     icon: 'warning',
+      //     title: 'Dokumen Belum Lengkap',
+      //     html: `Dokumen berikut masih diperlukan:<br/><br/><strong>${missingRequirements.map((req) => req.charAt(0).toUpperCase() + req.slice(1)).join('<br/>')}</strong>`,
+      //     confirmButtonColor: '#f59e0b',
+      //   })
+      //   return
+      // }
 
       // Process documents for each requirement
       for (let i = 0; i < selectedPengajuan.value.Persyaratans.length; i++) {
