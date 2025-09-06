@@ -1,294 +1,305 @@
 <template>
   <UserHeader />
-  <div class="max-w-7xl mx-auto px-4 py-6">
-    <div class="bg-white rounded-lg shadow-lg">
-      <button @click="goBack" class="flex items-center gap-2 py-2 rounded mb-5">
-        <i class="fa-solid fa-arrow-left"></i>
-        Kembali
-      </button>
-      <div class="px-6 py-4 border-b border-gray-200">
-        <h2 class="text-2xl font-bold text-gray-800">Daftar Pengajuan Perlu Revisi</h2>
-        <p class="text-gray-600 mt-1">Kelola pengajuan yang memerlukan perbaikan</p>
-      </div>
-
-      <!-- Loading State -->
-      <div v-if="loading" class="flex justify-center items-center py-12">
-        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-        <span class="ml-3 text-gray-600">Memuat data...</span>
-      </div>
-
-      <!-- Error State -->
-      <div v-else-if="error" class="px-6 py-8">
-        <div class="bg-red-50 border border-red-200 rounded-lg p-4">
-          <div class="flex">
-            <div class="flex-shrink-0">
-              <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                <path
-                  fill-rule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                  clip-rule="evenodd"
-                />
-              </svg>
-            </div>
-            <div class="ml-3">
-              <h3 class="text-sm font-medium text-red-800">Error</h3>
-              <p class="mt-1 text-sm text-red-700">{{ error }}</p>
-            </div>
-          </div>
+  <div class="bg-white min-h-screen">
+    <div class="max-w-7xl mx-auto px-4 p-5">
+      <div class="bg-white rounded-lg shadow-lg p-4">
+        <button @click="goBack" class="flex items-center gap-2 py-2 rounded mb-5">
+          <i class="fa-solid fa-arrow-left"></i>
+          Kembali
+        </button>
+        <div class="px-6 py-4 border-b border-gray-200">
+          <h2 class="text-2xl font-bold text-gray-800">Daftar Pengajuan Perlu Revisi</h2>
+          <p class="text-gray-600 mt-1">Kelola pengajuan yang memerlukan perbaikan</p>
         </div>
-      </div>
 
-      <!-- Table -->
-      <div v-else class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gray-50">
-            <tr>
-              <th
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                Kode Pengajuan
-              </th>
-              <th
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                Jenis Pengajuan
-              </th>
-              <th
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                Status
-              </th>
-
-              <th
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                Tanggal Update
-              </th>
-              <th
-                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-              >
-                Aksi
-              </th>
-            </tr>
-          </thead>
-          <tbody class="bg-white divide-y divide-gray-200">
-            <tr v-for="pengajuan in pengajuanList" :key="pengajuan.id" class="hover:bg-gray-50">
-              <td class="px-6 py-4 whitespace-nowrap">
-                <div class="text-sm font-medium text-gray-900">{{ pengajuan.kode_pengajuan }}</div>
-              </td>
-              <td class="px-6 py-4">
-                <div class="text-sm text-gray-900">{{ pengajuan.JenisPengajuan?.name || '-' }}</div>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <span
-                  class="inline-flex px-2 py-1 text-xs font-semibold rounded-full"
-                  :class="getStatusBadgeClass(pengajuan.status)"
-                >
-                  {{ getStatusText(pengajuan.status) }}
-                </span>
-              </td>
-
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {{ formatDate(pengajuan.updatedAt) }}
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                <div class="flex space-x-2">
-                  <button
-                    @click="openEditModal(pengajuan)"
-                    class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
-                  >
-                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                      />
-                    </svg>
-                    Edit
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-
-        <!-- Empty State -->
-        <div v-if="!loading && !error && pengajuanList.length === 0" class="text-center py-12">
-          <svg
-            class="mx-auto h-12 w-12 text-gray-400"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-            />
-          </svg>
-          <h3 class="mt-2 text-sm font-medium text-gray-900">Tidak ada pengajuan</h3>
-          <p class="mt-1 text-sm text-gray-500">Belum ada pengajuan yang memerlukan revisi.</p>
+        <!-- Loading State -->
+        <div v-if="loading" class="flex justify-center items-center py-12">
+          <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          <span class="ml-3 text-gray-600">Memuat data...</span>
         </div>
-      </div>
-    </div>
 
-    <!-- Edit Modal -->
-    <div
-      v-if="showEditModal"
-      class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50"
-    >
-      <div
-        class="relative top-20 mx-auto p-5 border w-11/12 max-w-4xl shadow-lg rounded-md bg-white"
-      >
-        <div class="mt-3">
-          <!-- Modal Header -->
-          <div class="flex justify-between items-center pb-4 border-b">
-            <h3 class="text-lg font-medium text-gray-900">
-              Edit Pengajuan: {{ selectedPengajuan?.kode_pengajuan }}
-            </h3>
-            <button @click="closeEditModal" class="text-gray-400 hover:text-gray-600">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
-          </div>
-
-          <!-- Modal Body -->
-          <div class="mt-4 max-h-96 overflow-y-auto">
-            <div class="space-y-4">
-              <!-- Pengajuan Info -->
-              <div class="bg-gray-50 p-4 rounded-lg">
-                <h4 class="font-medium text-gray-900 mb-2">Informasi Pengajuan</h4>
-                <div class="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <span class="font-medium text-gray-600">Kode:</span>
-                    <span class="ml-2">{{ selectedPengajuan?.kode_pengajuan }}</span>
-                  </div>
-                  <div>
-                    <span class="font-medium text-gray-600">Jenis:</span>
-                    <span class="ml-2">{{ selectedPengajuan?.JenisPengajuan?.name }}</span>
-                  </div>
-                  <div>
-                    <span class="font-medium text-gray-600">Status:</span>
-                    <span class="ml-2">{{ getStatusText(selectedPengajuan?.status) }}</span>
-                  </div>
-                  <div>
-                    <span class="font-medium text-gray-600">Update Terakhir:</span>
-                    <span class="ml-2">{{ formatDate(selectedPengajuan?.updatedAt) }}</span>
-                  </div>
-                </div>
+        <!-- Error State -->
+        <div v-else-if="error" class="px-6 py-8">
+          <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+            <div class="flex">
+              <div class="flex-shrink-0">
+                <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path
+                    fill-rule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                    clip-rule="evenodd"
+                  />
+                </svg>
               </div>
+              <div class="ml-3">
+                <h3 class="text-sm font-medium text-red-800">Error</h3>
+                <p class="mt-1 text-sm text-red-700">{{ error }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
 
-              <!-- Documents List -->
-              <div>
-                <h4 class="font-medium text-gray-900 mb-3">Dokumen dan Upload Perbaikan</h4>
-                <div class="space-y-3">
-                  <div
-                    v-for="doc in selectedPengajuan?.Documents"
-                    :key="doc.id"
-                    class="border border-gray-200 rounded-lg p-4"
+        <!-- Table -->
+        <div v-else class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Kode Pengajuan
+                </th>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Jenis Pengajuan
+                </th>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Status
+                </th>
+
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Tanggal Update
+                </th>
+                <th
+                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  Aksi
+                </th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              <tr v-for="pengajuan in pengajuanList" :key="pengajuan.id" class="hover:bg-gray-50">
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm font-medium text-gray-900">
+                    {{ pengajuan.kode_pengajuan }}
+                  </div>
+                </td>
+                <td class="px-6 py-4">
+                  <div class="text-sm text-gray-900">
+                    {{ pengajuan.JenisPengajuan?.name || '-' }}
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span
+                    class="inline-flex px-2 py-1 text-xs font-semibold rounded-full"
+                    :class="getStatusBadgeClass(pengajuan.status)"
                   >
-                    <div class="space-y-3">
-                      <div class="flex justify-between items-start">
-                        <div class="flex-1">
-                          <h5 class="font-medium text-gray-900 capitalize">
-                            {{ doc.document_type.replace(/_/g, ' ') }}
-                          </h5>
-                          <p class="text-sm text-gray-600 mt-1">{{ doc.original_name }}</p>
-                          <div class="flex items-center mt-2">
-                            <span
-                              class="inline-flex px-2 py-1 text-xs rounded-full"
-                              :class="getDocumentStatusClass(doc.status)"
-                            >
-                              {{ getDocumentStatusText(doc.status) }}
-                            </span>
-                          </div>
-                          <div
-                            v-if="doc.admin_note"
-                            class="mt-2 p-2 bg-red-50 border border-red-200 rounded"
-                          >
-                            <p class="text-sm text-red-800">
-                              <span class="font-medium">Catatan Admin:</span> {{ doc.admin_note }}
-                            </p>
-                          </div>
-                        </div>
-                        <a
-                          :href="doc.file_url"
-                          target="_blank"
-                          class="ml-4 inline-flex items-center px-3 py-1 border border-gray-300 text-sm rounded-md text-gray-700 bg-white hover:bg-gray-50"
-                        >
-                          <svg
-                            class="w-4 h-4 mr-1"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="2"
-                              d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                            />
-                          </svg>
-                          Download
-                        </a>
-                      </div>
+                    {{ getStatusText(pengajuan.status) }}
+                  </span>
+                </td>
 
-                      <!-- Upload Section for rejected documents -->
-                      <div v-if="doc.status === 'rejected'" class="border-t pt-3">
-                        <div class="flex items-center space-x-3">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  {{ formatDate(pengajuan.updatedAt) }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                  <div class="flex space-x-2">
+                    <button
+                      @click="openEditModal(pengajuan)"
+                      class="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+                    >
+                      <svg
+                        class="w-4 h-4 mr-1"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                        />
+                      </svg>
+                      Edit
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Empty State -->
+          <div v-if="!loading && !error && pengajuanList.length === 0" class="text-center py-12">
+            <svg
+              class="mx-auto h-12 w-12 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              />
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-gray-900">Tidak ada pengajuan</h3>
+            <p class="mt-1 text-sm text-gray-500">Belum ada pengajuan yang memerlukan revisi.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Edit Modal -->
+      <div
+        v-if="showEditModal"
+        class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50"
+      >
+        <div
+          class="relative top-20 mx-auto p-5 border w-11/12 max-w-4xl shadow-lg rounded-md bg-white"
+        >
+          <div class="mt-3">
+            <!-- Modal Header -->
+            <div class="flex justify-between items-center pb-4 border-b">
+              <h3 class="text-lg font-medium text-gray-900">
+                Edit Pengajuan: {{ selectedPengajuan?.kode_pengajuan }}
+              </h3>
+              <button @click="closeEditModal" class="text-gray-400 hover:text-gray-600">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="mt-4 max-h-96 overflow-y-auto">
+              <div class="space-y-4">
+                <!-- Pengajuan Info -->
+                <div class="bg-gray-50 p-4 rounded-lg">
+                  <h4 class="font-medium text-gray-900 mb-2">Informasi Pengajuan</h4>
+                  <div class="grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <span class="font-medium text-gray-600">Kode:</span>
+                      <span class="ml-2">{{ selectedPengajuan?.kode_pengajuan }}</span>
+                    </div>
+                    <div>
+                      <span class="font-medium text-gray-600">Jenis:</span>
+                      <span class="ml-2">{{ selectedPengajuan?.JenisPengajuan?.name }}</span>
+                    </div>
+                    <div>
+                      <span class="font-medium text-gray-600">Status:</span>
+                      <span class="ml-2">{{ getStatusText(selectedPengajuan?.status) }}</span>
+                    </div>
+                    <div>
+                      <span class="font-medium text-gray-600">Update Terakhir:</span>
+                      <span class="ml-2">{{ formatDate(selectedPengajuan?.updatedAt) }}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Documents List -->
+                <div>
+                  <h4 class="font-medium text-gray-900 mb-3">Dokumen dan Upload Perbaikan</h4>
+                  <div class="space-y-3">
+                    <div
+                      v-for="doc in selectedPengajuan?.Documents"
+                      :key="doc.id"
+                      class="border border-gray-200 rounded-lg p-4"
+                    >
+                      <div class="space-y-3">
+                        <div class="flex justify-between items-start">
                           <div class="flex-1">
-                            <input
-                              :ref="`fileInput-${doc.id}`"
-                              type="file"
-                              accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
-                              @change="(event) => handleFileSelect(event, doc.id)"
-                              class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                            />
+                            <h5 class="font-medium text-gray-900 capitalize">
+                              {{ doc.document_type.replace(/_/g, ' ') }}
+                            </h5>
+                            <p class="text-sm text-gray-600 mt-1">{{ doc.original_name }}</p>
+                            <div class="flex items-center mt-2">
+                              <span
+                                class="inline-flex px-2 py-1 text-xs rounded-full"
+                                :class="getDocumentStatusClass(doc.status)"
+                              >
+                                {{ getDocumentStatusText(doc.status) }}
+                              </span>
+                            </div>
+                            <div
+                              v-if="doc.admin_note"
+                              class="mt-2 p-2 bg-red-50 border border-red-200 rounded"
+                            >
+                              <p class="text-sm text-red-800">
+                                <span class="font-medium">Catatan Admin:</span> {{ doc.admin_note }}
+                              </p>
+                            </div>
                           </div>
-                          <button
-                            @click="uploadDocument(doc.id)"
-                            :disabled="!selectedFiles[doc.id] || uploadingFiles[doc.id]"
-                            class="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                          <a
+                            :href="doc.file_url"
+                            target="_blank"
+                            class="ml-4 inline-flex items-center px-3 py-1 border border-gray-300 text-sm rounded-md text-gray-700 bg-white hover:bg-gray-50"
                           >
                             <svg
-                              v-if="uploadingFiles[doc.id]"
-                              class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                              class="w-4 h-4 mr-1"
                               fill="none"
+                              stroke="currentColor"
                               viewBox="0 0 24 24"
                             >
-                              <circle
-                                class="opacity-25"
-                                cx="12"
-                                cy="12"
-                                r="10"
-                                stroke="currentColor"
-                                stroke-width="4"
-                              ></circle>
                               <path
-                                class="opacity-75"
-                                fill="currentColor"
-                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                              ></path>
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                              />
                             </svg>
-                            {{ uploadingFiles[doc.id] ? 'Uploading...' : 'Upload' }}
-                          </button>
+                            Download
+                          </a>
                         </div>
-                        <div
-                          v-if="updatedDocuments[doc.id]"
-                          class="mt-2 p-2 bg-green-50 border border-green-200 rounded"
-                        >
-                          <p class="text-sm text-green-800">
-                            <span class="font-medium">Dokumen baru berhasil diupload:</span>
-                            {{ updatedDocuments[doc.id].original_name }}
-                          </p>
+
+                        <!-- Upload Section for rejected documents -->
+                        <div v-if="doc.status === 'rejected'" class="border-t pt-3">
+                          <div class="flex items-center space-x-3">
+                            <div class="flex-1">
+                              <input
+                                :ref="`fileInput-${doc.id}`"
+                                type="file"
+                                accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                                @change="(event) => handleFileSelect(event, doc.id)"
+                                class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                              />
+                            </div>
+                            <button
+                              @click="uploadDocument(doc.id)"
+                              :disabled="!selectedFiles[doc.id] || uploadingFiles[doc.id]"
+                              class="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                            >
+                              <svg
+                                v-if="uploadingFiles[doc.id]"
+                                class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                              >
+                                <circle
+                                  class="opacity-25"
+                                  cx="12"
+                                  cy="12"
+                                  r="10"
+                                  stroke="currentColor"
+                                  stroke-width="4"
+                                ></circle>
+                                <path
+                                  class="opacity-75"
+                                  fill="currentColor"
+                                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                ></path>
+                              </svg>
+                              {{ uploadingFiles[doc.id] ? 'Uploading...' : 'Upload' }}
+                            </button>
+                          </div>
+                          <div
+                            v-if="updatedDocuments[doc.id]"
+                            class="mt-2 p-2 bg-green-50 border border-green-200 rounded"
+                          >
+                            <p class="text-sm text-green-800">
+                              <span class="font-medium">Dokumen baru berhasil diupload:</span>
+                              {{ updatedDocuments[doc.id].original_name }}
+                            </p>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -296,49 +307,49 @@
                 </div>
               </div>
             </div>
-          </div>
 
-          <!-- Modal Footer -->
-          <div class="flex justify-between items-center pt-4 border-t mt-4">
-            <div class="text-sm text-gray-600">
-              <span v-if="hasUpdatedDocuments" class="text-green-600 font-medium">
-                {{ Object.keys(updatedDocuments).length }} dokumen telah diupdate
-              </span>
-            </div>
-            <div class="flex justify-end space-x-3">
-              <button
-                @click="closeEditModal"
-                class="px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-              >
-                Tutup
-              </button>
-              <button
-                @click="submitRevision"
-                :disabled="!hasUpdatedDocuments || submittingRevision"
-                class="px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-              >
-                <svg
-                  v-if="submittingRevision"
-                  class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-                  fill="none"
-                  viewBox="0 0 24 24"
+            <!-- Modal Footer -->
+            <div class="flex justify-between items-center pt-4 border-t mt-4">
+              <div class="text-sm text-gray-600">
+                <span v-if="hasUpdatedDocuments" class="text-green-600 font-medium">
+                  {{ Object.keys(updatedDocuments).length }} dokumen telah diupdate
+                </span>
+              </div>
+              <div class="flex justify-end space-x-3">
+                <button
+                  @click="closeEditModal"
+                  class="px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                 >
-                  <circle
-                    class="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    stroke-width="4"
-                  ></circle>
-                  <path
-                    class="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  ></path>
-                </svg>
-                {{ submittingRevision ? 'Mengirim...' : 'Kirim Revisi' }}
-              </button>
+                  Tutup
+                </button>
+                <button
+                  @click="submitRevision"
+                  :disabled="!hasUpdatedDocuments || submittingRevision"
+                  class="px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                >
+                  <svg
+                    v-if="submittingRevision"
+                    class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      class="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      stroke-width="4"
+                    ></circle>
+                    <path
+                      class="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                  {{ submittingRevision ? 'Mengirim...' : 'Kirim Revisi' }}
+                </button>
+              </div>
             </div>
           </div>
         </div>
