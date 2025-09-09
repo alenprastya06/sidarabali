@@ -836,34 +836,27 @@ const steps = [
   { title: 'Review & Submit', description: 'Periksa dan kirim pengajuan' },
 ]
 
-// Provide selectedPengajuanId untuk child components yang menggunakan inject
 provide('selectedPengajuanId', selectedPengajuanId)
 
-// Computed properties
 const selectedPengajuan = computed(() => {
   const pengajuan = pengajuanList.value.find((p) => p.id === selectedPengajuanId.value)
 
   if (!pengajuan) return null
 
-  // Pastikan Persyaratans adalah array
   if (pengajuan && !Array.isArray(pengajuan.Persyaratans)) {
     pengajuan.Persyaratans = []
   }
 
-  // Filter out "surat keterangan dari kecamatan" if hasHGB is true
-  // Gunakan debounce atau setTimeout untuk menghindari perubahan berulang
   if (
     pengajuan &&
     pengajuan.name.trim().toLowerCase() ===
       'standar pelayanan kelengkapan administrasi permohonan rekomendasi hak atas tanah' &&
     hasHGB.value === true
   ) {
-    // Buat salinan array untuk menghindari mutasi langsung
-    const filteredRequirements = pengajuan.Persyaratans.filter(
-      (req) => req.toLowerCase() !== 'surat keterangan dari kecamatan',
-    )
+    // const filteredRequirements = pengajuan.Persyaratans.filter(
+    //   (req) => req.toLowerCase() !== 'surat keterangan dari kecamatan',
+    // )
 
-    // Return objek baru untuk menghindari mutasi reaktif
     return {
       ...pengajuan,
       Persyaratans: filteredRequirements,
@@ -1093,10 +1086,10 @@ const onPengajuanChange = async () => {
       setTimeout(async () => {
         const result = await Swal.fire({
           icon: 'question',
-          title: 'Konfirmasi Surat Hak Guna Bangunan',
-          text: 'Apakah Anda memiliki Surat Hak Guna Bangunan?',
+          title: 'Konfirmasi Pendafataran Peningkatan Hak',
+          text: 'Apakah Anda Anda Pertama Kali Melakukan Pendaftaramn ?',
           showCancelButton: true,
-          confirmButtonText: 'Ya, saya memiliki HGB',
+          confirmButtonText: 'Ya',
           cancelButtonText: 'Tidak',
           confirmButtonColor: '#3085d6',
           cancelButtonColor: '#d33',

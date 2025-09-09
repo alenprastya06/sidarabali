@@ -33,12 +33,10 @@
     </div>
 
     <div v-else class="bg-white rounded-xl shadow-lg overflow-hidden">
-      <!-- Table Header -->
       <div class="bg-gradient-to-r from-blue-900 to-blue-900 px-6 py-4">
         <h3 class="text-lg font-semibold text-white">Daftar Draf Dokumen</h3>
       </div>
 
-      <!-- Table Content -->
       <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50">
@@ -76,7 +74,6 @@
               :key="pengajuan.id_pengajuan"
               class="hover:bg-gray-50 transition-colors duration-200"
             >
-              <!-- Informasi Pengajuan -->
               <td class="px-6 py-4 whitespace-nowrap">
                 <div class="flex flex-col">
                   <div class="text-sm font-semibold text-gray-900">
@@ -91,7 +88,6 @@
                 </div>
               </td>
 
-              <!-- Pemilik & Lokasi -->
               <td class="px-6 py-4">
                 <div class="flex flex-col">
                   <div class="text-sm font-medium text-gray-900">
@@ -109,7 +105,6 @@
                 </div>
               </td>
 
-              <!-- Detail Lahan -->
               <td class="px-6 py-4 whitespace-nowrap">
                 <div class="flex flex-col">
                   <div class="text-sm text-gray-900">
@@ -124,7 +119,6 @@
                 </div>
               </td>
 
-              <!-- Status -->
               <td class="px-6 py-4 whitespace-nowrap">
                 <span
                   :class="getStatusClass(pengajuan.status)"
@@ -137,10 +131,8 @@
                 </div>
               </td>
 
-              <!-- Actions -->
               <td class="px-6 py-4 whitespace-nowrap text-right">
                 <div class="flex justify-end space-x-3">
-                  <!-- Download Draft Button (if available) -->
                   <a
                     v-if="pengajuan.draft_document_url"
                     :href="pengajuan.draft_document_url"
@@ -159,7 +151,6 @@
                     Draft
                   </a>
 
-                  <!-- Download Final Document Button (if available) -->
                   <a
                     v-if="pengajuan.final_document_url"
                     :href="pengajuan.final_document_url"
@@ -178,36 +169,26 @@
                     Final
                   </a>
 
-                  <!-- Generate Final Document Button -->
                   <button
-                    v-if="pengajuan.status !== 'completed' || !pengajuan.final_document_url"
-                    @click="generateFinalDocument(pengajuan.id_pengajuan)"
-                    :disabled="isGenerating[pengajuan.id_pengajuan]"
-                    class="inline-flex items-center px-3 py-2 bg-red-500 hover:bg-red-600 text-white text-xs font-medium rounded-lg transition-colors duration-200 shadow-sm hover:shadow-md disabled:bg-gray-400 disabled:cursor-not-allowed disabled:shadow-none"
-                    title="Generate Dokumen Final"
+                    @click="openDetailModal(pengajuan)"
+                    class="inline-flex items-center px-3 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 text-xs font-medium rounded-lg transition-colors duration-200 shadow-sm hover:shadow-md"
+                    title="Lihat Detail Dokumen"
                   >
-                    <span v-if="isGenerating[pengajuan.id_pengajuan]" class="flex items-center">
-                      <div
-                        class="animate-spin rounded-full h-3 w-3 border-t-2 border-b-2 border-white mr-1"
-                      ></div>
-                      Loading...
-                    </span>
-                    <span v-else class="flex items-center">
-                      <svg
-                        class="w-4 h-4 mr-1"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          stroke-width="2"
-                          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                        />
-                      </svg>
-                      Generate
-                    </span>
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                      ></path>
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      ></path>
+                    </svg>
+                    Detail
                   </button>
                 </div>
               </td>
@@ -216,13 +197,100 @@
         </table>
       </div>
 
-      <!-- Table Footer -->
       <div class="bg-gray-50 px-6 py-3 border-t border-gray-200">
         <div class="flex justify-between items-center">
           <div class="text-sm text-gray-500">
             Total: <span class="font-semibold">{{ allPengajuan.length }}</span> pengajuan
           </div>
           <div class="text-xs text-gray-400">Klik "Generate" untuk membuat dokumen final</div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      v-if="isDetailModalOpen"
+      class="fixed inset-0 z-50 flex items-center justify-center overflow-x-hidden overflow-y-auto outline-none focus:outline-none bg-black bg-opacity-50"
+    >
+      <div class="relative w-full max-w-3xl mx-auto my-6">
+        <div
+          class="border-0 rounded-lg shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none"
+        >
+          <div
+            class="flex items-start justify-between p-5 border-b border-solid border-blueGray-200 rounded-t bg-gradient-to-r from-blue-900 to-blue-900"
+          >
+            <h3 class="text-3xl font-semibold text-white">Detail Dokumen</h3>
+            <button
+              class="p-1 ml-auto bg-transparent text-white hover:bg-gray-300 hover:text-black rounded-full float-right text-3xl leading-none font-semibold outline-none focus:outline-none"
+              @click="closeDetailModal"
+            >
+              <span
+                class="bg-transparent text-white hover:text-gray-800 h-6 w-6 text-2xl block outline-none"
+              >
+                ×
+              </span>
+            </button>
+          </div>
+          <div class="p-6 flex-auto">
+            <div class="mb-4">
+              <h4 class="text-lg font-semibold text-gray-800 mb-2">Informasi Pengajuan</h4>
+              <p class="text-sm text-gray-600">
+                <span class="font-medium">Jenis Pengajuan:</span>
+                {{ selectedPengajuan?.JenisPengajuan?.name }}
+              </p>
+              <p class="text-sm text-gray-600">
+                <span class="font-medium">Kode Pengajuan:</span>
+                {{ selectedPengajuan?.kode_pengajuan }}
+              </p>
+            </div>
+            <div class="mb-4">
+              <h4 class="text-lg font-semibold text-gray-800 mb-2">Daftar Dokumen</h4>
+              <div
+                v-if="
+                  selectedPengajuan &&
+                  selectedPengajuan.Documents &&
+                  selectedPengajuan.Documents.length > 0
+                "
+              >
+                <div
+                  v-for="doc in selectedPengajuan.Documents"
+                  :key="doc.id"
+                  class="flex items-center justify-between py-2 border-b border-gray-200 last:border-b-0"
+                >
+                  <div class="flex flex-col">
+                    <p class="text-sm font-medium text-gray-900 capitalize">
+                      {{ doc.document_type.replace(/_/g, ' ') }}
+                    </p>
+                    <a
+                      :href="doc.file_url"
+                      target="_blank"
+                      class="text-xs text-blue-600 hover:underline"
+                      >{{ doc.file_url }}</a
+                    >
+                  </div>
+                  <a
+                    :href="doc.file_url"
+                    target="_blank"
+                    class="text-blue-600 hover:text-blue-800 font-semibold text-xs"
+                    title="Unduh Dokumen"
+                  >
+                    Unduh
+                  </a>
+                </div>
+              </div>
+              <p v-else class="text-sm text-gray-500">Tidak ada dokumen yang terlampir.</p>
+            </div>
+          </div>
+          <div
+            class="flex items-center justify-end p-6 border-t border-solid border-blueGray-200 rounded-b"
+          >
+            <button
+              class="text-red-500 background-transparent font-bold uppercase px-6 py-3 text-sm outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+              type="button"
+              @click="closeDetailModal"
+            >
+              Tutup
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -239,6 +307,8 @@ const users = ref([])
 const isLoading = ref(true)
 const error = ref(null)
 const isGenerating = ref({})
+const isDetailModalOpen = ref(false)
+const selectedPengajuan = ref(null)
 
 // Computed property to flatten all pengajuan from all users
 const allPengajuan = computed(() => {
@@ -326,6 +396,18 @@ const generateFinalDocument = async (pengajuanId) => {
   }
 }
 
+// Function to open the detail modal
+const openDetailModal = (pengajuan) => {
+  selectedPengajuan.value = pengajuan
+  isDetailModalOpen.value = true
+}
+
+// Function to close the detail modal
+const closeDetailModal = () => {
+  isDetailModalOpen.value = false
+  selectedPengajuan.value = null
+}
+
 // Function to get status class for styling
 const getStatusClass = (status) => {
   switch (status) {
@@ -403,6 +485,25 @@ onMounted(() => {
 }
 
 .overflow-x-auto::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Custom scrollbar for modal */
+.modal-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+
+.modal-scroll::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+.modal-scroll::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.modal-scroll::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
 }
 </style>
