@@ -925,12 +925,15 @@ const viewDetails = async (pengajuanId) => {
       throw new Error('Token tidak ditemukan. Silakan login kembali.')
     }
 
-    const response = await fetch(`https://bitwisi.cloud/api/pengajuan/${pengajuanId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
+    const response = await fetch(
+      `${import.meta.env.VITE_API_BASE_URL}/api/pengajuan/${pengajuanId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
       },
-    })
+    )
 
     if (!response.ok) {
       if (response.status === 401) {
@@ -976,7 +979,7 @@ const fetchData = async () => {
       throw new Error('Token tidak ditemukan. Silakan login kembali.')
     }
 
-    const response = await fetch('https://bitwisi.cloud/api/dashboard', {
+    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/dashboard`, {
       headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',

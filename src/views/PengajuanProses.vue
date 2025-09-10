@@ -310,7 +310,7 @@ const showModal = ref(false)
 const selectedPengajuan = ref(null)
 const token = localStorage.getItem('token')
 
-const API_BASE = 'https://bitwisi.cloud/api'
+const API_BASE = `${import.meta.env.VITE_API_BASE_URL}/api`
 
 const axiosConfig = {
   headers: {

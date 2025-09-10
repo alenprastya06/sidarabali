@@ -562,7 +562,7 @@ const confirmRejectPengajuan = async () => {
     }
 
     const response = await axios.put(
-      `https://bitwisi.cloud/api/pengajuan/${pengajuanId}/reject`,
+      `${import.meta.env.VITE_API_BASE_URL}/api/pengajuan/${pengajuanId}/reject`,
       {
         admin_note: rejectReason.value.trim(),
       },
@@ -635,7 +635,7 @@ const confirmDocumentAction = async () => {
     errorMessage.value = ''
 
     const response = await axios.put(
-      `https://bitwisi.cloud/api/pengajuan/documents/${selectedDocument.value.id}/status`,
+      `${import.meta.env.VITE_API_BASE_URL}/api/pengajuan/documents/${selectedDocument.value.id}/status`,
       {
         status: finalStatus,
         admin_note: adminNote.value.trim() || null,

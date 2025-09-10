@@ -250,9 +250,12 @@ const submitForgotPassword = async () => {
 
   try {
     // Call API to request password reset
-    const response = await axios.post('https://bitwisi.cloud/api/auth/forgot-password', {
-      email: email.value,
-    })
+    const response = await axios.post(
+      `${import.meta.env.VITE_API_BASE_URL}/api/auth/forgot-password`,
+      {
+        email: email.value,
+      },
+    )
 
     // Always show success message for security reasons
     // (even if email doesn't exist, we don't want to reveal that)

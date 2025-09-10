@@ -574,6 +574,18 @@
                   >
                   <span class="font-medium text-sm">{{ lahanData.luas_lahan }} m²</span>
                 </div>
+                <div v-if="lahanData.tanggal_surat_rt" class="flex flex-col sm:flex-row sm:items-center">
+                  <span class="text-gray-600 text-xs sm:text-sm font-medium sm:w-24">Tanggal Surat RT:</span>
+                  <span class="font-medium text-sm">{{ lahanData.tanggal_surat_rt }}</span>
+                </div>
+                <div v-if="lahanData.tanggal_surat_pernyataan" class="flex flex-col sm:flex-row sm:items-center">
+                  <span class="text-gray-600 text-xs sm:text-sm font-medium sm:w-24">Tanggal Surat Pernyataan:</span>
+                  <span class="font-medium text-sm">{{ lahanData.tanggal_surat_pernyataan }}</span>
+                </div>
+                <div v-if="lahanData.nib" class="flex flex-col sm:flex-row sm:items-center">
+                  <span class="text-gray-600 text-xs sm:text-sm font-medium sm:w-24">NIB:</span>
+                  <span class="font-medium text-sm">{{ lahanData.nib }}</span>
+                </div>
                 <div
                   v-if="lahanData.kelurahan || lahanData.wilayah_kelurahan"
                   class="flex flex-col sm:flex-row sm:items-center"
@@ -1014,11 +1026,14 @@ const handleLahanUpdate = (data) => {
 // API methods
 const fetchPengajuan = async () => {
   try {
-    const pengajuanResponse = await axios.get('https://bitwisi.cloud/api/jenis-pengajuan', {
-      headers: {
-        Authorization: `Bearer ${token}`,
+    const pengajuanResponse = await axios.get(
+      `${import.meta.env.VITE_API_BASE_URL}/api/jenis-pengajuan`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       },
-    })
+    )
     pengajuanList.value = pengajuanResponse.data
   } catch (err) {
     error.value = err.response ? err.response.data.message : err.message
@@ -1082,18 +1097,17 @@ const onPengajuanChange = async () => {
     console.log('Target pengajuan matched, showing Swal prompt')
 
     try {
-      // Gunakan setTimeout untuk memastikan dialog muncul setelah render selesai
       setTimeout(async () => {
-        const result = await Swal.fire({
-          icon: 'question',
-          title: 'Konfirmasi Pendafataran Peningkatan Hak',
-          text: 'Apakah Anda Anda Pertama Kali Melakukan Pendaftaramn ?',
-          showCancelButton: true,
-          confirmButtonText: 'Ya',
-          cancelButtonText: 'Tidak',
-          confirmButtonColor: '#3085d6',
-          cancelButtonColor: '#d33',
-        })
+        // const result = await Swal.fire({
+        //   icon: 'question',
+        //   title: 'Konfirmasi Pendafataran Peningkatan Hak',
+        //   text: 'Apakah Anda Anda Pertama Kali Melakukan Pendaftaramn ?',
+        //   showCancelButton: true,
+        //   confirmButtonText: 'Ya',
+        //   cancelButtonText: 'Tidak',
+        //   confirmButtonColor: '#3085d6',
+        //   cancelButtonColor: '#d33',
+        // })
 
         // Setelah dialog selesai, update state
         hasHGB.value = result.isConfirmed
@@ -1377,6 +1391,9 @@ const submitDocuments = async () => {
       },
       lahan: {
         no_surat_rt: lahanData.value.no_surat_rt || '',
+        tanggal_surat_rt: lahanData.value.tanggal_surat_rt || '',
+        tanggal_surat_pernyataan: lahanData.value.tanggal_surat_pernyataan || '',
+        nib: lahanData.value.nib || '',
         jenis_bangunan: lahanData.value.jenis_bangunan,
         luas_lahan: parseFloat(lahanData.value.luas_lahan),
         alamat_rt: lahanData.value.alamat_rt || lahanData.value.rt || '',
@@ -1396,14 +1413,18 @@ const submitDocuments = async () => {
     const timeoutId = setTimeout(() => controller.abort(), 30000)
 
     try {
-      const response = await axios.post('https://bitwisi.cloud/api/pengajuan', payload, {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}/api/pengajuan`,
+        payload,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          signal: controller.signal,
+          timeout: 30000,
         },
-        signal: controller.signal,
-        timeout: 30000,
-      })
+      )
 
       clearTimeout(timeoutId)
       console.log('Submit response:', response.data)

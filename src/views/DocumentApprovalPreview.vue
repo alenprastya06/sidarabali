@@ -376,7 +376,7 @@ const fetchData = async () => {
     loading.value = true
     error.value = null
 
-    const response = await axios.get('https://bitwisi.cloud/api/pengajuan', {
+    const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/pengajuan`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

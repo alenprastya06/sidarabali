@@ -338,6 +338,52 @@
                       required
                     />
                   </div>
+                  <div>
+                    <label
+                      for="lahan_tanggal_surat_rt"
+                      class="block text-sm font-medium text-gray-700 mb-2"
+                    >
+                      Tanggal Surat RT <span class="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="date"
+                      id="lahan_tanggal_surat_rt"
+                      v-model="lahan.tanggal_surat_rt"
+                      @change="validateAndEmitLahan"
+                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                      required
+                    />
+                  </div>
+                  <div class="lg:col-span-2">
+                    <label for="owner_nib" class="block text-sm font-medium text-gray-700 mb-2">
+                      NIB (Nomor Induk Berusaha) - Opsional
+                    </label>
+                    <input
+                      type="text"
+                      id="owner_nib"
+                      v-model="lahan.nib"
+                      @input="validateAndEmitLahan"
+                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                      placeholder="13 digit NIB (jika ada)"
+                      maxlength="13"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      for="lahan_tanggal_surat_pernyataan"
+                      class="block text-sm font-medium text-gray-700 mb-2"
+                    >
+                      Tanggal Surat Pernyataan <span class="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="date"
+                      id="lahan_tanggal_surat_pernyataan"
+                      v-model="lahan.tanggal_surat_pernyataan"
+                      @change="validateAndEmitLahan"
+                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                      required
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -614,7 +660,10 @@ const owner = ref({
 })
 
 const lahan = ref({
+  nib: '',
   no_surat_rt: '',
+  tanggal_surat_rt: '',
+  tanggal_surat_pernyataan: '',
   jenis_bangunan: '',
   luas_lahan: 0,
   alamat_rt: '',
@@ -642,6 +691,8 @@ const isOwnerValid = computed(() => {
 
 const isLahanValid = computed(() => {
   return (
+    lahan.value.tanggal_surat_rt &&
+    lahan.value.tanggal_surat_pernyataan &&
     lahan.value.no_surat_rt &&
     lahan.value.jenis_bangunan &&
     lahan.value.luas_lahan > 0 &&
@@ -658,6 +709,7 @@ const resetForms = () => {
   owner.value = {
     nik: '',
     email: '',
+
     phone: '',
     jenis_kelamin: 'L',
     nama: '',
@@ -670,6 +722,9 @@ const resetForms = () => {
   }
   lahan.value = {
     no_surat_rt: '',
+    nib: '',
+    tanggal_surat_rt: '',
+    tanggal_surat_pernyataan: '',
     jenis_bangunan: '',
     luas_lahan: 0,
     alamat_rt: '',

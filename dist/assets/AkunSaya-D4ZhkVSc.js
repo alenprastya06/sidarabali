@@ -1,0 +1,1 @@
+import e from"./ProfilePage-Ce-v28HT.js";import{E as o,A as a,b as r}from"./index-y-aUSKFk.js";import"./createLucideIcon-ByXTwt-w.js";const s=o({__name:"AkunSaya",setup(t){return(n,_)=>(r(),a(e))}});export{s as default};

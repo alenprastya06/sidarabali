@@ -425,20 +425,8 @@ const suratList = ref([])
 const suratListLoading = ref(true)
 const suratListError = ref(null)
 
-// **MODIFICATION**: Removed showDocumentModal and currentDocument as no longer using modal
-// const showDocumentModal = ref(false);
-// const currentDocument = ref(null);
-
-// **MODIFICATION**: Removed confirm-related refs as no longer using ConfirmModal
-// const showConfirmModal = ref(false);
-// const confirmMessage = ref('');
-// const confirmAction = ref(null);
-// const confirmId = ref(null);
-// const confirmStatus = ref(null);
-
 const isAdmin = ref(false)
 
-// Computed Property
 const userRole = computed(() => {
   const user = JSON.parse(localStorage.getItem('user'))
   return user ? user.role : 'user'
@@ -509,7 +497,9 @@ const fetchPengajuanList = async () => {
   pengajuanLoading.value = true
   pengajuanError.value = null
   try {
-    const response = await axios.get('/api/documents/pengajuan/all')
+    const response = await axios.get(
+      `${import.meta.env.VITE_API_BASE_URL}/api/documents/pengajuan/all`,
+    )
     pengajuanList.value = response.data
   } catch (error) {
     console.error('Error fetching pengajuan list:', error)
@@ -523,7 +513,7 @@ const fetchAllDocuments = async () => {
   allDocumentsLoading.value = true
   allDocumentsError.value = null
   try {
-    const response = await axios.get('/api/documents/all')
+    const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/documents/all`)
     allDocumentsGrouped.value = response.data
   } catch (error) {
     console.error('Error fetching all documents:', error)
@@ -537,7 +527,7 @@ const fetchAllSurat = async () => {
   suratListLoading.value = true
   suratListError.value = null
   try {
-    const response = await axios.get('/api/surat/all')
+    const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/surat/all`)
     suratList.value = response.data
   } catch (error) {
     console.error('Error fetching all surat:', error)
@@ -567,7 +557,7 @@ const updateDocumentStatus = async (docId, status) => {
   // **MODIFICATION**: Replaced ConfirmModal with window.confirm()
   if (window.confirm(`Are you sure you want to change document ${docId} status to '${status}'?`)) {
     try {
-      await axios.put(`/api/documents/${docId}/status`, {
+      await axios.put(`${import.meta.env.VITE_API_BASE_URL}/api/documents/${docId}/status`, {
         // Use docId directly
         status: status, // Use status directly
         admin_notes: `Status updated by admin to ${status}`,
@@ -594,7 +584,7 @@ const deleteDocument = async (docId) => {
     )
   ) {
     try {
-      await axios.delete(`/api/documents/${docId}`) // Use docId directly
+      await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/api/documents/${docId}`) // Use docId directly
       alert('Document deleted successfully!')
       fetchAllDocuments()
     } catch (error) {
@@ -620,7 +610,7 @@ const bulkDeleteDocuments = async () => {
     )
   ) {
     try {
-      await axios.post('/api/documents/bulk-delete', {
+      await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/documents/bulk-delete`, {
         documentIds: selectedDocuments.value,
       })
       alert('Selected documents deleted successfully!')
@@ -657,7 +647,7 @@ const downloadSurat = (suratId) => {
     alert("You don't have permission to perform this action.")
     return
   }
-  const downloadUrl = `/api/surat/${suratId}/download`
+  const downloadUrl = `${import.meta.env.VITE_API_BASE_URL}/api/surat/${suratId}/download`
   window.open(downloadUrl, '_blank')
   setTimeout(() => {
     fetchAllSurat()
@@ -676,7 +666,7 @@ const deleteSurat = async (suratId) => {
     )
   ) {
     try {
-      await axios.delete(`/api/surat/${suratId}`) // Use suratId directly
+      await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/api/surat/${suratId}`) // Use suratId directly
       alert('Surat Pengantar deleted successfully!')
       fetchAllSurat()
     } catch (error) {

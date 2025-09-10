@@ -569,7 +569,7 @@ const submitResetPassword = async () => {
   try {
     // Call API to reset password
     const response = await axios.post(
-      `https://bitwisi.cloud/api/auth/reset-password/${token.value}`,
+      `${import.meta.env.VITE_API_BASE_URL}/api/auth/reset-password/${token.value}`,
       {
         password: formData.value.password,
         confirmPassword: formData.value.confirmPassword,

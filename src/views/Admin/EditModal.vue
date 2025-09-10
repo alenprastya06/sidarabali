@@ -340,7 +340,7 @@ const fetchDocumentContent = async () => {
     }
 
     const response = await axios.get(
-      `https://bitwisi.cloud/api/pengajuan/${pengajuanId}/prepare-document`,
+      `${import.meta.env.VITE_API_BASE_URL}/api/pengajuan/${pengajuanId}/prepare-document`,
       {
         headers: { Authorization: `Bearer ${token}` },
         timeout: 30000,
@@ -388,7 +388,7 @@ const generateDocument = async () => {
     }
 
     const response = await axios.post(
-      `https://bitwisi.cloud/api/pengajuan/${pengajuanId}/generate-edited-document`,
+      `${import.meta.env.VITE_API_BASE_URL}/api/pengajuan/${pengajuanId}/generate-edited-document`,
       {
         editedHtml: editedHtml.value,
         metadata: {

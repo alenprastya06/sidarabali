@@ -32,7 +32,7 @@ const fetchUserProfile = async () => {
       return
     }
 
-    const response = await axios.get('https://bitwisi.cloud/api/profile', {
+    const response = await axios.get('${import.meta.env.VITE_API_BASE_URL}/api/profile', {
       headers: {
         Authorization: `Bearer ${token}`,
       },
